@@ -64,6 +64,7 @@ class ConfigValidator:
             stop_avg_accuracy=None,
             pre_computed_data_driven_clustering: bool = False,
             distance_metric_on_parameters: bool = True,
+            pretrained_models: bool = False,
 
     ):
 
@@ -84,8 +85,10 @@ class ConfigValidator:
             )
         )
 
+
         self.WEIGHT_DECAY = weight_decay
         self.NUMBER_OF_CLIENTS = number_of_clients
+        self.NUMBER_OF_CLASSES = self._dataset_number_of_classes
         self.DIRICHLET_BETA = dirichlet_beta
         self.DESIRED_DISTRIBUTION = desired_distribution
         self.SAVE_BEFORE_AGGREGATION_MODELS = save_before_aggregation_models
@@ -100,41 +103,43 @@ class ConfigValidator:
         self.STOP_AVG_ACCURACY = self._stop_avg_accuracy(stop_avg_accuracy)
         self.PRE_COMPUTED_DATA_DRIVEN_CLUSTERING = pre_computed_data_driven_clustering
         self.DISTANCE_METRIC_ON_PARAMETERS = distance_metric_on_parameters
+        self.PRETRAINED_MODELS = pretrained_models
 
-    def get_config(self):
-
-        config_dic = {
-            "MODEL_TYPE": self.MODEL_TYPE,
-            "DATASET_TYPE": self.DATASET_TYPE,
-            "NUMBER_OF_CLASSES": self._dataset_number_of_classes,
-            "DATA_DISTRIBUTION": self.DATA_DISTRIBUTION,
-            "ROUND_EPOCHS": self.NUMBER_OF_EPOCHS,
-            "SENSITIVITY_PERCENTAGE": self.SENSITIVITY_PERCENTAGE,
-            "DYNAMIC_SENSITIVITY_PERCENTAGE": self.DYNAMIC_SENSITIVITY_PERCENTAGE,
-            "TRAIN_BATCH_SIZE": self.TRAIN_BATCH_SIZE,
-            "TEST_BATCH_SIZE": self.TEST_BATCH_SIZE,
-            "TRANSFORM_INPUT_SIZE": self.TRANSFORM_INPUT_SIZE,
-            "LEARNING_RATE": 0.0001 if self.MODEL_TYPE == MODEL_VGG else 0.001,
-            "WEIGHT_DECAY": self.WEIGHT_DECAY,
-            "NUMBER_OF_CLIENTS": self.NUMBER_OF_CLIENTS,
-            "DIRICHLET_BETA": self.DIRICHLET_BETA,
-            "DESIRED_DISTRIBUTION": self.DESIRED_DISTRIBUTION,
-            "SAVE_BEFORE_AGGREGATION_MODELS": self.SAVE_BEFORE_AGGREGATION_MODELS,
-            "SAVE_GLOBAL_MODELS": self.SAVE_GLOBAL_MODELS,
-            "DO_CLUSTER": self.DO_CLUSTER,
-            "CLUSTERING_PERIOD": self.CLUSTERING_PERIOD,
-            "FEDERATED_LEARNING_ROUNDS": self.FEDERATED_LEARNING_ROUNDS,
-            "DISTANCE_METRIC": self.DISTANCE_METRIC,
-            "GPU_INDEX": self.DISTANCE_METRIC,
-            "DEVICE": self.DISTANCE_METRIC,
-            "STOP_AVG_ACCURACY": self.DISTANCE_METRIC,
-            "REMOVE_COMMON_IDS": self.REMOVE_COMMON_IDS,
-            "FED_AVG": self.FED_AVG,
-            "PRE_COMPUTED_DATA_DRIVEN_CLUSTERING": self.PRE_COMPUTED_DATA_DRIVEN_CLUSTERING,
-            "DISTANCE_METRIC_ON_PARAMETERS": self.DISTANCE_METRIC_ON_PARAMETERS,
-        }
-
-        return config_dic
+    # def get_config(self):
+    #
+    #     config_dic = {
+    #         "MODEL_TYPE": self.MODEL_TYPE,
+    #         "DATASET_TYPE": self.DATASET_TYPE,
+    #         "NUMBER_OF_CLASSES": self.NUMBER_OF_CLASSES,
+    #         "DATA_DISTRIBUTION": self.DATA_DISTRIBUTION,
+    #         "ROUND_EPOCHS": self.NUMBER_OF_EPOCHS,
+    #         "SENSITIVITY_PERCENTAGE": self.SENSITIVITY_PERCENTAGE,
+    #         "DYNAMIC_SENSITIVITY_PERCENTAGE": self.DYNAMIC_SENSITIVITY_PERCENTAGE,
+    #         "TRAIN_BATCH_SIZE": self.TRAIN_BATCH_SIZE,
+    #         "TEST_BATCH_SIZE": self.TEST_BATCH_SIZE,
+    #         "TRANSFORM_INPUT_SIZE": self.TRANSFORM_INPUT_SIZE,
+    #         "LEARNING_RATE": 0.0001 if self.MODEL_TYPE == MODEL_VGG else 0.001,
+    #         "WEIGHT_DECAY": self.WEIGHT_DECAY,
+    #         "NUMBER_OF_CLIENTS": self.NUMBER_OF_CLIENTS,
+    #         "DIRICHLET_BETA": self.DIRICHLET_BETA,
+    #         "DESIRED_DISTRIBUTION": self.DESIRED_DISTRIBUTION,
+    #         "SAVE_BEFORE_AGGREGATION_MODELS": self.SAVE_BEFORE_AGGREGATION_MODELS,
+    #         "SAVE_GLOBAL_MODELS": self.SAVE_GLOBAL_MODELS,
+    #         "DO_CLUSTER": self.DO_CLUSTER,
+    #         "CLUSTERING_PERIOD": self.CLUSTERING_PERIOD,
+    #         "FEDERATED_LEARNING_ROUNDS": self.FEDERATED_LEARNING_ROUNDS,
+    #         "DISTANCE_METRIC": self.DISTANCE_METRIC,
+    #         "GPU_INDEX": self.DISTANCE_METRIC,
+    #         "DEVICE": self.DISTANCE_METRIC,
+    #         "STOP_AVG_ACCURACY": self.DISTANCE_METRIC,
+    #         "REMOVE_COMMON_IDS": self.REMOVE_COMMON_IDS,
+    #         "FED_AVG": self.FED_AVG,
+    #         "PRE_COMPUTED_DATA_DRIVEN_CLUSTERING": self.PRE_COMPUTED_DATA_DRIVEN_CLUSTERING,
+    #         "DISTANCE_METRIC_ON_PARAMETERS": self.DISTANCE_METRIC_ON_PARAMETERS,
+    #         self.PRETRAINED
+    #     }
+    #
+    #     return config_dic
 
     def _validate_model_type(self, model_type: str) -> str:
         if model_type not in [

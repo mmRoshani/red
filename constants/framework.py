@@ -1,2 +1,4 @@
 LOG_PATH = "./logs"
-GLOBAL_MODELS_SAVING_PATH = "./nets/after_aggregation"
+MODELS_SAVING_PATH = "./models"
+GLOBAL_MODELS_SAVING_PATH = f"{MODELS_SAVING_PATH}/after_aggregation"
+PLOT_PATH = './plots'

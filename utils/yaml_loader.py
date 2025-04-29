@@ -46,6 +46,7 @@ def load_objectified_yaml(yaml_path: str):
         'fed_avg': getattr(yaml_obj, 'fed_avg', False),
         'pre_computed_data_driven_clustering': getattr(yaml_obj, 'pre_computed_data_driven_clustering', False),
         'distance_metric_on_parameters': getattr(yaml_obj, 'distance_metric_on_parameters', False),
+        'pretrained_models': getattr(yaml_obj, 'pretrained_models', False),
     }
 
     return config_dict

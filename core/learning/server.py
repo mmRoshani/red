@@ -1,5 +1,5 @@
 from constants.framework import GLOBAL_MODELS_SAVING_PATH
-from core.federated_training_device import FederatedTrainingDevice
+from core.learning.federated_training_device import FederatedTrainingDevice
 from constants.distances_constants import *
 import pandas as pd
 from sklearn.cluster import AffinityPropagation

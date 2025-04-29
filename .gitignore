@@ -178,6 +178,8 @@ models/
 models/*
 data/
 data/*
+plots/
+plots/*
 20*/
 20*/*
 

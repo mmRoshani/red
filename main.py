@@ -1,4 +1,10 @@
+from transformers.models.auto.image_processing_auto import model_type
+
+from core.learning.client import Client
+from data.data_driven_clustering import compute_data_driven_clustering
+from data.label_distribution import calculate_label_distribution
 from data.load_and_prepare_data import load_and_prepare_data
+from utils.framework_setup import FrameworkSetup
 from utils.log import Log
 from utils.log_path import log_path
 from utils.variable_name import var_name
@@ -6,6 +12,8 @@ from utils.yaml_loader import load_objectified_yaml
 from utils.checker import none_checker
 import typer
 from validators.config_validator import ConfigValidator
+from tabulate import tabulate
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 def main(config_yaml_path: str = "./config.yaml"):
@@ -30,9 +38,46 @@ def main(config_yaml_path: str = "./config.yaml"):
         remove_common_ids=config.REMOVE_COMMON_IDS,
     ), config.MODEL_TYPE, config.DISTANCE_METRIC)
 
+    table_data = [[key, value] for key, value in config.items()]
+    log.info(tabulate(table_data, headers=["Config Key", "Value"], tablefmt="grid"))
+
+
+    log.info("----------    framework   setup   --------------------------------------------------")
+    FrameworkSetup.path_setup(config)
+
     log.info("----------    data    distribution   --------------------------------------------------")
     train_loaders, test_loaders = load_and_prepare_data(config, log)
 
+    if config.PRE_COMPUTED_DATA_DRIVEN_CLUSTERING:
+        log.info("clients train loader label distribution")
+        config = config | {"DATA_DRIVEN_CLUSTERING": compute_data_driven_clustering(train_loaders, config, log)}
+
+
+    log.info("----------    defining    base    model   --------------------------------------------------")
+
+    **nural_network = nural_network_factory(model_type=config.MODEL_TYPE, number_of_classes=config.NUMBER_OF_CLASSES, pretrained_models=config.PRETRAINED_MODELS)
+
+    log.info("----------    initializing Clients    --------------------------------------------------")
+    client_list = [i for i in range(config.NUMBER_OF_CLIENTS)]
+
+    assert len(client_list) == config.NUMBER_OF_CLIENTS
+
+    clients = [
+        Client(
+            Net,
+            # lambda x : torch.optim.Adam(x, lr=0.001,  amsgrad=True),
+            lambda x: torch.optim.SGD(
+                x, lr=0.001, momentum=0.9, weight_decay=1e-4
+                # x, lr=0.001, momentum=0.9,
+            ),  #! we have to use SGD since our base papers also tested their methods via SGD
+            i,
+            train_loaders[i],
+            test_loaders[i],
+        )
+        for i in client_list
+    ]
+
+server = Server(Net)
 
 if __name__ == "__main__":
     typer.run(main)
