@@ -1,3 +1,4 @@
+from data.load_and_prepare_data import load_and_prepare_data
 from utils.log import Log
 from utils.log_path import log_path
 from utils.variable_name import var_name
@@ -28,6 +29,9 @@ def main(config_yaml_path: str = "./config.yaml"):
         pre_computed_data_driven_clustering=config.PRE_COMPUTED_DATA_DRIVEN_CLUSTERING,
         remove_common_ids=config.REMOVE_COMMON_IDS,
     ), config.MODEL_TYPE, config.DISTANCE_METRIC)
+
+    log.info("----------    data    distribution   --------------------------------------------------")
+    train_loaders, test_loaders = load_and_prepare_data(config, log)
 
 
 if __name__ == "__main__":

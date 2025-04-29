@@ -1,12 +1,18 @@
 from learning.evaluation import model_evaluation
 from utils.checker import device_checker
+from utils.log import Log
+from typing import Any, Dict
+
+from validators.config_validator import ConfigValidator
+
 
 class FederatedTrainingDevice(object):
-    def __init__(self, model, log, device: str):
+    def __init__(self, model, config: 'ConfigValidator', log: 'Log'):
 
         self.log = log
-        self.device = device_checker(device)
-        self.model = model.to(device)
+        self.config = config
+        self.device = device_checker(self.config.DEVICE)
+        self.model = model.to(self.device)
 
     def evaluate(self):
         _loss, _accuracy = model_evaluation(self.model, self.eval_loader)

@@ -1,7 +1,6 @@
 device: 'cuda'
 gpu_index: 0
 
-
 model_type: "resnet50"
 dataset_type: "cifar100"
 

@@ -1,5 +1,4 @@
 import torch
-
 from typing import Tuple
 
 from constants.distances_constants import (
@@ -102,14 +101,13 @@ class ConfigValidator:
         self.PRE_COMPUTED_DATA_DRIVEN_CLUSTERING = pre_computed_data_driven_clustering
         self.DISTANCE_METRIC_ON_PARAMETERS = distance_metric_on_parameters
 
-    def get_config(
-            self,
-    ):
+    def get_config(self):
+
         config_dic = {
             "MODEL_TYPE": self.MODEL_TYPE,
             "DATASET_TYPE": self.DATASET_TYPE,
             "NUMBER_OF_CLASSES": self._dataset_number_of_classes,
-            "PARTITION": self.DATA_DISTRIBUTION,
+            "DATA_DISTRIBUTION": self.DATA_DISTRIBUTION,
             "ROUND_EPOCHS": self.NUMBER_OF_EPOCHS,
             "SENSITIVITY_PERCENTAGE": self.SENSITIVITY_PERCENTAGE,
             "DYNAMIC_SENSITIVITY_PERCENTAGE": self.DYNAMIC_SENSITIVITY_PERCENTAGE,
