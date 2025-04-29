@@ -1,0 +1,32 @@
+device: 'cuda'
+gpu_index: 0
+
+
+model_type: "resnet50"
+dataset_type: "cifar100"
+
+data_distribution_kind: "20"
+desired_distribution: null
+dirichlet_beta: 0.5
+
+distance_metric: "coordinate"
+dynamic_sensitivity_percentage: true
+sensitivity_percentage: 100
+remove_common_ids: false
+fed_avg: false
+
+distance_metric_on_parameters: true
+number_of_epochs: 10
+train_batch_size: 256
+test_batch_size: 256
+transform_input_size: null
+weight_decay: null
+
+number_of_clients: 10
+pre_computed_data_driven_clustering: false
+do_cluster: true
+clustering_period: 6
+federated_learning_rounds: 60
+stop_avg_accuracy: 1.0
+save_before_aggregation_models: false
+save_global_models: false
