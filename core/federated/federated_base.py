@@ -6,9 +6,21 @@ from typing import Any, Dict
 from validators.config_validator import ConfigValidator
 
 
-class FederatedTrainingDevice(object):
-    def __init__(self, model, config: 'ConfigValidator', log: 'Log'):
+class FederatedBase(object):
 
+        def __init__(
+                self,
+                nodes: List[VirtualNode],
+                topology: Union[str, np.ndarray],
+                resources: Union[str, PlacementGroup] = "uniform",
+                federation_id: str = "",
+                is_tune: bool = False,
+                bundle_offset: int = 0,
+        ):
+    def __init__(
+        self,
+        model,
+        config: 'ConfigValidator', log: 'Log'):
         self.log = log
         self.config = config
         self.device = device_checker(self.config.DEVICE)

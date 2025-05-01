@@ -1,4 +1,4 @@
-from core.learning.federated_training_device import FederatedTrainingDevice
+from core.learning.federated_base import FederatedTrainingDevice
 from utils.log import Log
 from validators.config_validator import ConfigValidator
 import copy as py_copy
