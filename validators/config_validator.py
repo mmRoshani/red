@@ -1,11 +1,15 @@
 import torch
 from typing import Tuple
 
+from constants.client_roles_constants import TRAIN, TEST, EVAL, TRAIN_TEST, TRAIN_EVAL, TEST_EVAL, TRAIN_TEST_EVAL
+
 from constants.distances_constants import (
     DISTANCE_COORDINATE,
     DISTANCE_COSINE,
     DISTANCE_EUCLIDEAN,
 )
+from constants.federated_learning_schema_constants import TRADITIONAL_FEDERATED_LEARNING, CLUSTER_FEDERATED_LEARNING, \
+    DECENTRALIZED_FEDERATED_LEARNING
 
 from constants.models_constants import (
     MODEL_CNN,
@@ -65,6 +69,8 @@ class ConfigValidator:
             pre_computed_data_driven_clustering: bool = False,
             distance_metric_on_parameters: bool = True,
             pretrained_models: bool = False,
+            federated_learning_schema: str = None,
+            client_role: str = None,
 
     ):
 
@@ -85,7 +91,6 @@ class ConfigValidator:
             )
         )
 
-
         self.WEIGHT_DECAY = weight_decay
         self.NUMBER_OF_CLIENTS = number_of_clients
         self.NUMBER_OF_CLASSES = self._dataset_number_of_classes
@@ -104,8 +109,12 @@ class ConfigValidator:
         self.PRE_COMPUTED_DATA_DRIVEN_CLUSTERING = pre_computed_data_driven_clustering
         self.DISTANCE_METRIC_ON_PARAMETERS = distance_metric_on_parameters
         self.PRETRAINED_MODELS = pretrained_models
+        self.FEDERATED_LEARNING_SCHEMA = self._federated_learning_schema(federated_learning_schema)
+        self.CLIENT_ROLE = self._client_role(client_role)
 
-    # def get_config(self):
+    # def items(self):
+    #
+    # TODO: sync with class filed items
     #
     #     config_dic = {
     #         "MODEL_TYPE": self.MODEL_TYPE,
@@ -329,3 +338,27 @@ class ConfigValidator:
         if stop_avg_accuracy is None:
             return 0.1
         return stop_avg_accuracy
+
+    def _federated_learning_schema(self, federated_learning_schema: str):
+        if federated_learning_schema not in [
+            TRADITIONAL_FEDERATED_LEARNING,
+            CLUSTER_FEDERATED_LEARNING,
+            DECENTRALIZED_FEDERATED_LEARNING,
+        ]:
+            raise TypeError(f"unknown federated_learning_schema type: {federated_learning_schema}")
+        return federated_learning_schema
+
+
+    def _client_role(self, client_role: str):
+        if client_role not in [
+            TRAIN,
+            TEST,
+            EVAL,
+            TRAIN_TEST,
+            TRAIN_EVAL,
+            TEST_EVAL,
+            TRAIN_TEST_EVAL,
+        ]:
+            raise TypeError(f"unknown client_role type: {client_role}")
+        return client_role
+

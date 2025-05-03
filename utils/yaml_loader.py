@@ -47,6 +47,8 @@ def load_objectified_yaml(yaml_path: str):
         'pre_computed_data_driven_clustering': getattr(yaml_obj, 'pre_computed_data_driven_clustering', False),
         'distance_metric_on_parameters': getattr(yaml_obj, 'distance_metric_on_parameters', False),
         'pretrained_models': getattr(yaml_obj, 'pretrained_models', False),
+        'federated_learning_schema': getattr(yaml_obj, 'federated_learning_schema', None),
+        'client_role': getattr(yaml_obj, 'client_role', None),
     }
 
     return config_dict

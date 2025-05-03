@@ -1,6 +1,11 @@
 device: 'cuda'
 gpu_index: 0
 
+# TraditionalFederatedLearning | ClusterFederatedLearningSchema
+federated_learning_schema: 'TraditionalFederatedLearning'
+# train | test | eval | train-test-eval | train-eval | etc.
+client_role: 'train'
+
 model_type: "cnn"
 pretrained_models: false
 dataset_type: "fmnist"
