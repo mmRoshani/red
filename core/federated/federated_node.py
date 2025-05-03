@@ -15,11 +15,12 @@ from core.communication.message import Message
 from core.communication.topology_manager import TopologyManager
 from utils.exceptions import EndProcessException
 from utils.queue import Queue
+from validators.config_validator import ConfigValidator
 
 
 class FederatedNode(object):
 
-    def __init__(self, node_id: str, role: str, federation_id: str = "", **build_args):
+    def __init__(self, node_id: str, role: str, config: 'ConfigValidator', federation_id: str = ""):
         """Creates a node in the federation. Must not be called directly or overridden.
 
         Args:
@@ -46,10 +47,10 @@ class FederatedNode(object):
         self._node_metrics: Dict[str, Any] = {}
 
         # Buildup function
-        self._node_config = build_args
-        self.build(**build_args)
+        self._node_config = config
+        self.build(config)
 
-    def build(self, **build_args):
+    def build(self, config: 'ConfigValidator'):
         """
         Performs the setup of the node's environment when the node is added to
         a federation.

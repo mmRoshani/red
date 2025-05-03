@@ -5,6 +5,7 @@ from data.data_driven_clustering import compute_data_driven_clustering
 from data.load_and_prepare_data import load_and_prepare_data
 from schemas import schema_factory
 from utils.framework_setup import FrameworkSetup
+from utils.generate_list import generate_list
 from utils.log import Log
 from utils.log_path import log_path
 from utils.variable_name import var_name
@@ -12,6 +13,7 @@ from utils.yaml_loader import load_objectified_yaml
 from utils.checker import none_checker
 import typer
 from validators.config_validator import ConfigValidator
+from validators.runtime_config import RuntimeConfig
 
 
 def main(config_yaml_path: str = "./config.yaml"):
@@ -51,13 +53,20 @@ def main(config_yaml_path: str = "./config.yaml"):
         config = config | {"DATA_DRIVEN_CLUSTERING": compute_data_driven_clustering(train_loaders, config, log)}
 
 
-#     log.info("----------    defining    base    model   --------------------------------------------------")
-#
-#     **nural_network = nural_network_factory(model_type=config.MODEL_TYPE, number_of_classes=config.NUMBER_OF_CLASSES, pretrained_models=config.PRETRAINED_MODELS)
-#
+    log.info("----------    runtime configurations  --------------------------------------------------")
+    clients_id_list = generate_list(count=config.NUMBER_OF_CLIENTS, log=log)
 
+    config.RUNTIME_COMFIG = RuntimeConfig(
+        clients_id_list=clients_id_list,
+        train_loaders=train_loaders,
+        test_loaders=test_loaders,
+        log=log
+    )
+
+
+    log.info("----------    Schema  Factory --------------------------------------------------")
     schema_runner = schema_factory(config.FEDERATED_LEARNING_SCHEMA ,log)
-    schema_runner(number_clients_or_ids=config.NUMBER_OF_CLIENTS, roles=[config.CLIENT_ROLE for _ in range(config.NUMBER_OF_CLIENTS)])
+    schema_runner(config)
 
 #     log.info("----------    initializing Clients    --------------------------------------------------")
 #     client_list = [i for i in range(config.NUMBER_OF_CLIENTS)]

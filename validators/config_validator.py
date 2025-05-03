@@ -1,5 +1,7 @@
 import torch
-from typing import Tuple
+from typing import Tuple, List
+
+from torch.utils.data import DataLoader
 
 from constants.client_roles_constants import TRAIN, TEST, EVAL, TRAIN_TEST, TRAIN_EVAL, TEST_EVAL, TRAIN_TEST_EVAL
 
@@ -18,7 +20,7 @@ from constants.models_constants import (
     MODEL_MOBILENET,
     MODEL_VGG,
     MODEL_VIT,
-    MODEL_SWIN
+    MODEL_SWIN, MODEL_LENET
 )
 
 from constants.datasets_constants import (
@@ -37,6 +39,8 @@ from constants.data_distribution_constants import (
     DATA_DISTRIBUTION_FIX,
 )
 from utils.gpu_index_list import list_available_gpus
+from utils.log import Log
+from validators.runtime_config import RuntimeConfig
 
 
 class ConfigValidator:
@@ -71,8 +75,11 @@ class ConfigValidator:
             pretrained_models: bool = False,
             federated_learning_schema: str = None,
             client_role: str = None,
+            client_sampling_rate: float = 1.0,
 
     ):
+
+        self._RUNTIME_COMFIG: RuntimeConfig | None = None
 
         self.MODEL_TYPE = self._validate_model_type(model_type)
         self.DATASET_TYPE = self._validate_dataset_type(dataset_type)
@@ -93,7 +100,7 @@ class ConfigValidator:
 
         self.WEIGHT_DECAY = weight_decay
         self.NUMBER_OF_CLIENTS = number_of_clients
-        self.NUMBER_OF_CLASSES = self._dataset_number_of_classes
+        self.NUMBER_OF_CLASSES = self._dataset_number_of_classes(self.DATASET_TYPE)
         self.DIRICHLET_BETA = dirichlet_beta
         self.DESIRED_DISTRIBUTION = desired_distribution
         self.SAVE_BEFORE_AGGREGATION_MODELS = save_before_aggregation_models
@@ -111,6 +118,7 @@ class ConfigValidator:
         self.PRETRAINED_MODELS = pretrained_models
         self.FEDERATED_LEARNING_SCHEMA = self._federated_learning_schema(federated_learning_schema)
         self.CLIENT_ROLE = self._client_role(client_role)
+        self.CLIENT_SAMPLING_RATE = client_sampling_rate
 
     # def items(self):
     #
@@ -150,9 +158,18 @@ class ConfigValidator:
     #
     #     return config_dic
 
+    @property
+    def RUNTIME_COMFIG(self) -> RuntimeConfig:
+        return self._RUNTIME_COMFIG
+
+    @RUNTIME_COMFIG.setter
+    def RUNTIME_COMFIG(self, runtime_config: RuntimeConfig ) -> None:
+        self._RUNTIME_COMFIG: RuntimeConfig = runtime_config
+
     def _validate_model_type(self, model_type: str) -> str:
         if model_type not in [
             MODEL_CNN,
+            MODEL_LENET,
             MODEL_RESNET_18,
             MODEL_RESNET_50,
             MODEL_MOBILENET,

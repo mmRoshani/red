@@ -3,16 +3,17 @@ import time
 from typing import List
 from schemas.traditional_federated_learning.templates import MessagingServer, MessagingClient
 from schemas.traditional_federated_learning.traditional_federated_learning_schema import TraditionalFederatedLearningSchema
+from validators.config_validator import ConfigValidator
 
 
-def run_traditional_federated_learning(number_clients_or_ids: int,roles: List[str]):
+def run_traditional_federated_learning(config: ConfigValidator):
     ray.init()
 
     federation = TraditionalFederatedLearningSchema(
         server_template=MessagingServer,
         client_template=MessagingClient,
-        n_clients_or_ids=number_clients_or_ids,
-        roles=roles,
+        n_clients_or_ids=config.NUMBER_OF_CLIENTS,
+        roles=[config.CLIENT_ROLE for _ in range(config.NUMBER_OF_CLIENTS)],
     )
 
     report = federation.train(

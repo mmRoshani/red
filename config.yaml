@@ -28,6 +28,7 @@ transform_input_size: null
 weight_decay: null
 
 number_of_clients: 10
+client_sampling_rate: 1.0
 pre_computed_data_driven_clustering: false
 do_cluster: true
 clustering_period: 6

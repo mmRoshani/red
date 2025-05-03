@@ -49,6 +49,7 @@ def load_objectified_yaml(yaml_path: str):
         'pretrained_models': getattr(yaml_obj, 'pretrained_models', False),
         'federated_learning_schema': getattr(yaml_obj, 'federated_learning_schema', None),
         'client_role': getattr(yaml_obj, 'client_role', None),
+        'client_sampling_rate': getattr(yaml_obj, 'client_sampling_rate', None),
     }
 
     return config_dict
