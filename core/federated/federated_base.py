@@ -1,6 +1,5 @@
 from core.federated.virtual_node import VirtualNode
 from utils.checker import device_checker
-from utils.importer import dynamic_import
 from utils.log import Log
 import numpy as np
 import ray
@@ -10,8 +9,8 @@ from typing import Dict, List, Literal, Optional, Union
 from core.communication.message import Message
 from core.communication.topology_manager import TopologyManager
 from utils.resources import get_resources_split
+from validators.config_validator import ConfigValidator
 
-# VirtualNode = dynamic_import('core.federated.virtual_node', 'VirtualNode')
 
 # def __init__(
 #         self,
@@ -48,8 +47,8 @@ class FederatedBase(object):
             self,
             nodes: List[VirtualNode],
             topology: Union[str, np.ndarray],
+            config: 'ConfigValidator',
             resources: Union[str, PlacementGroup] = "uniform",
-            federation_id: str = "",
             is_tune: bool = False,
             bundle_offset: int = 0,
     ):
@@ -69,7 +68,6 @@ class FederatedBase(object):
                 created with the same number of bundles as the number of nodes in
                 the federation. If parameter `is_tune` is set to True, this argument
                 is ignored. Defaults to "uniform".
-            federation_id (str, optional): The ID of the federation. Defaults to "".
             is_tune (bool, optional): Whether the federation has to be instantiated
                 within a Tune experiment. Defaults to False.
             bundle_offset (int, optional): The bundle offset. This parameter is useful
@@ -80,15 +78,16 @@ class FederatedBase(object):
             ValueError: If the topology is not a valid topology.
             ValueError: If the resources are not a valid resource specification.
         """
-        self._fed_id = federation_id
+        self._fed_id = config.FEDERATION_ID
         self._name = "supervisor"
         self._nodes: List[VirtualNode] = nodes
         self._topology: Union[str, np.ndarray] = topology
+        self.config: 'ConfigValidator' = config
 
         if not is_tune:
             if isinstance(resources, str):
                 self._pg = get_resources_split(
-                    len(self._nodes), split_strategy=resources
+                    num_nodes=len(self._nodes), split_strategy=resources, num_gpus=1,
                 )
             else:
                 self._pg = resources

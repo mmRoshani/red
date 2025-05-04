@@ -1,11 +1,13 @@
 device: 'cuda'
 gpu_index: 0
 
+federation_id: '1.x.y'
 # TraditionalFederatedLearning | ClusterFederatedLearningSchema
 federated_learning_schema: 'TraditionalFederatedLearning'
 # train | test | eval | train-test-eval | train-eval | etc.
 client_role: 'train'
 
+learning_rate: 0.001
 model_type: "cnn"
 pretrained_models: false
 dataset_type: "fmnist"
@@ -19,6 +21,10 @@ dynamic_sensitivity_percentage: true
 sensitivity_percentage: 100
 remove_common_ids: false
 fed_avg: false
+
+# FedAvg | FedProx
+aggregation_strategy: "FedAvg"
+aggregation_sample_scaling: false
 
 distance_metric_on_parameters: true
 number_of_epochs: 10

@@ -50,6 +50,10 @@ def load_objectified_yaml(yaml_path: str):
         'federated_learning_schema': getattr(yaml_obj, 'federated_learning_schema', None),
         'client_role': getattr(yaml_obj, 'client_role', None),
         'client_sampling_rate': getattr(yaml_obj, 'client_sampling_rate', None),
+        'aggregation_strategy': getattr(yaml_obj, 'aggregation_strategy', None),
+        'aggregation_sample_scaling': getattr(yaml_obj, 'aggregation_sample_scaling', False),
+        'federation_id': getattr(yaml_obj, 'federation_id', ""),
+        'learning_rate': getattr(yaml_obj, 'learning_rate', "0.001"),
     }
 
     return config_dict

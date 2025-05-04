@@ -47,10 +47,10 @@ class FederatedNode(object):
         self._node_metrics: Dict[str, Any] = {}
 
         # Buildup function
-        self._node_config = config
-        self.build(config)
+        self.config = config
+        self.build()
 
-    def build(self, config: 'ConfigValidator'):
+    def build(self):
         """
         Performs the setup of the node's environment when the node is added to
         a federation.

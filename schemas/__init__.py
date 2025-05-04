@@ -1,2 +1,2 @@
-from .traditional_federated_learning.traditional_federated_learning import run_traditional_federated_learning
+from .traditional_federated_learning.traditional_federated_learning_executor import traditional_federated_learning_executor
 from .schema_factory import schema_factory

@@ -4,11 +4,7 @@ from typing import Type
 from ray.util.placement_group import PlacementGroup
 from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
 
-from utils.importer import dynamic_import
-
-# from core.federated.federated_base import FederatedBase
-
-# FederatedBase = dynamic_import('core.federated.federated_base', 'FederatedBase')
+from validators.config_validator import ConfigValidator
 
 
 class VirtualNode(object):
@@ -24,21 +20,19 @@ class VirtualNode(object):
         self,
         template: Type[object], # FederatedBase
         id: str,
-        federation_id: str,
         role: str,
-        config: Dict,
+        config: 'ConfigValidator',
     ) -> None:
         """Creates a new VirtualNode object.
 
         Args:
             template (Type[FederatedBase]): The template for the node.
             id (str): The ID of the node.
-            federation_id (str): The ID of the federation.
             role (str): The role of the node.
             config (Dict): The configuration to be passed to the build method of the node.
         """
         self.template = template
-        self.fed_id = federation_id
+        self.fed_id = config.FEDERATION_ID
         self.id = id
         self.role = role
         self.config = config
@@ -63,7 +57,7 @@ class VirtualNode(object):
                 placement_group, placement_group_bundle_index=bundle_idx
             ),
         ).remote(
-            node_id=self.id, role=self.role, federation_id=self.fed_id, **self.config
+            node_id=self.id, role=self.role, config=self.config, federation_id=self.fed_id,
         )
 
     @property

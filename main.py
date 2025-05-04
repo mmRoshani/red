@@ -65,8 +65,8 @@ def main(config_yaml_path: str = "./config.yaml"):
 
 
     log.info("----------    Schema  Factory --------------------------------------------------")
-    schema_runner = schema_factory(config.FEDERATED_LEARNING_SCHEMA ,log)
-    schema_runner(config)
+    schema_runner_fn = schema_factory(config.FEDERATED_LEARNING_SCHEMA ,log)
+    schema_runner_fn(config)
 
 #     log.info("----------    initializing Clients    --------------------------------------------------")
 #     client_list = [i for i in range(config.NUMBER_OF_CLIENTS)]

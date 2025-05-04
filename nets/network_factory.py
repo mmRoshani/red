@@ -12,7 +12,8 @@ from .vgg_16 import VGG_16
 from .vit_small import Vit_Small
 
 
-def network_factory(model_type: str, number_of_classes: int, pretrained: bool) -> torchModelType:
+def network_factory(model_type: str, number_of_classes: int, pretrained: bool, random_seed = 42) -> torchModelType:
+    print('use seed for models! in network_factory')
     if model_type == MODEL_CNN:
         return CNN(number_of_classes)
     elif model_type == MODEL_LENET:

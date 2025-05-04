@@ -14,6 +14,7 @@ from core.communication.topology_manager import _get_or_create_topology_manager
 from core.federated.federated_base import FederatedBase
 from core.federated.federated_node import FederatedNode
 from core.federated.virtual_node import VirtualNode
+from validators.config_validator import ConfigValidator
 
 
 class TraditionalFederatedLearningSchema(FederatedBase):
@@ -28,13 +29,10 @@ class TraditionalFederatedLearningSchema(FederatedBase):
         self,
         server_template: Type[FederatedNode],
         client_template: Type[FederatedNode],
-        n_clients_or_ids: Union[int, List[str]],
         roles: List[str],
-        server_config: Dict = {},
-        client_config: Dict = {},
+        config: 'ConfigValidator',
         server_id: str = "server",
         resources: Union[str, PlacementGroup] = "uniform",
-        federation_id: str = "",
         is_tune: bool = False,
         bundle_offset: int = 0,
     ) -> None:
@@ -64,6 +62,8 @@ class TraditionalFederatedLearningSchema(FederatedBase):
         Raises:
             ValueError: If the number of clients does not match the number of roles.
         """
+        self.config = config
+        n_clients_or_ids: Union[int, List[str]] = self.config.NUMBER_OF_CLIENTS
         if isinstance(n_clients_or_ids, int):
             c_ids = [f"client_{i}" for i in range(n_clients_or_ids)]
         else:
@@ -71,16 +71,16 @@ class TraditionalFederatedLearningSchema(FederatedBase):
 
         nodes = [
             VirtualNode(
-                server_template, server_id, federation_id, "train", server_config
+                server_template, server_id, "train", self.config,
             )
         ]
         for c_id, role in zip(c_ids, roles):
             nodes.append(
-                VirtualNode(client_template, c_id, federation_id, role, client_config)
+                VirtualNode(client_template, c_id, role, self.config)
             )
 
         super(TraditionalFederatedLearningSchema, self).__init__(
-            nodes, "star", resources, federation_id, is_tune, bundle_offset
+            nodes=nodes, topology="star", config=self.config, resources=resources, is_tune=is_tune, bundle_offset=bundle_offset
         )
 
     def train(self, server_args: Dict, client_args: Dict, blocking: bool = False) -> None:

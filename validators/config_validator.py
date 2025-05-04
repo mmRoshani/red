@@ -23,6 +23,11 @@ from constants.models_constants import (
     MODEL_SWIN, MODEL_LENET
 )
 
+from constants.aggregation_strategy_constants import (
+    AGGREGATION_STRATEGY_FED_AVG,
+    AGGREGATION_STRATEGY_FED_PROX,
+)
+
 from constants.datasets_constants import (
     DATA_SET_STL_10,
     DATA_SET_CIFAR_10,
@@ -46,6 +51,7 @@ from validators.runtime_config import RuntimeConfig
 class ConfigValidator:
     def __init__(
             self,
+            learning_rate: float,
             model_type: str,
             dataset_type: str,
             data_distribution_kind: str,
@@ -76,11 +82,15 @@ class ConfigValidator:
             federated_learning_schema: str = None,
             client_role: str = None,
             client_sampling_rate: float = 1.0,
+            aggregation_strategy: str = None,
+            aggregation_sample_scaling: bool = False,
+            federation_id: str = "",
 
     ):
 
         self._RUNTIME_COMFIG: RuntimeConfig | None = None
 
+        self.LEARNING_RATE = learning_rate
         self.MODEL_TYPE = self._validate_model_type(model_type)
         self.DATASET_TYPE = self._validate_dataset_type(dataset_type)
         self.DATA_DISTRIBUTION = self._validate_data_distribution(data_distribution_kind, desired_distribution)
@@ -119,6 +129,9 @@ class ConfigValidator:
         self.FEDERATED_LEARNING_SCHEMA = self._federated_learning_schema(federated_learning_schema)
         self.CLIENT_ROLE = self._client_role(client_role)
         self.CLIENT_SAMPLING_RATE = client_sampling_rate
+        self.AGGREGATION_STRATEGY = self._aggregation_strategy(aggregation_strategy)
+        self.AGGREGATION_SAMPLE_SCALING = aggregation_sample_scaling
+        self.FEDERATION_ID = federation_id
 
     # def items(self):
     #
@@ -299,7 +312,7 @@ class ConfigValidator:
             default_test_batch = 64
             default_input_size = 224
         else:
-            print(f"Unknown MODEL_TYPE '{self.MODEL_TYPE}'. Using generic defaults.")
+            print(f"MODEL_TYPE is '{self.MODEL_TYPE}'. Using generic defaults for:")
             default_train_batch = 32
             default_test_batch = 64
             default_input_size = 224
@@ -379,3 +392,11 @@ class ConfigValidator:
             raise TypeError(f"unknown client_role type: {client_role}")
         return client_role
 
+
+    def _aggregation_strategy(self, aggregation_strategy: str | None) -> str:
+        if aggregation_strategy not in [
+            AGGREGATION_STRATEGY_FED_AVG,
+            AGGREGATION_STRATEGY_FED_PROX,
+        ]:
+            raise TypeError(f"unknown aggregation_strategy type: {aggregation_strategy}")
+        return aggregation_strategy
