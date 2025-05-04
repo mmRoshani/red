@@ -1,5 +1,5 @@
 from transformers.models.auto.image_processing_auto import model_type
-
+import os
 # from core.federated.client import Client
 from data.data_driven_clustering import compute_data_driven_clustering
 from data.load_and_prepare_data import load_and_prepare_data
@@ -14,6 +14,7 @@ from utils.checker import none_checker
 import typer
 from validators.config_validator import ConfigValidator
 from validators.runtime_config import RuntimeConfig
+
 
 
 def main(config_yaml_path: str = "./config.yaml"):
@@ -66,7 +67,7 @@ def main(config_yaml_path: str = "./config.yaml"):
 
     log.info("----------    Schema  Factory --------------------------------------------------")
     schema_runner_fn = schema_factory(config.FEDERATED_LEARNING_SCHEMA ,log)
-    schema_runner_fn(config)
+    schema_runner_fn(config, log)
 
 #     log.info("----------    initializing Clients    --------------------------------------------------")
 #     client_list = [i for i in range(config.NUMBER_OF_CLIENTS)]
@@ -91,4 +92,6 @@ def main(config_yaml_path: str = "./config.yaml"):
 # server = Server(Net)
 
 if __name__ == "__main__":
+    os.environ["RAY_DEDUP_LOGS"] = "0"
+
     typer.run(main)

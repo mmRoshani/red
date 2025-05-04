@@ -1,24 +1,34 @@
+from core.aggregator.fed_avg_aggregator_base import FedAvgAggregator
+from core.communication.message import Message
 from core.federated import FederatedNode
 from decorators.remote import remote
 from nets.network_factory import network_factory
-from schemas.traditional_federated_learning.traditional_federated_learning_aggregator import \
-    TraditionalFederatedLearningAggregator
 from utils.checker import device_checker
 from validators.config_validator import ConfigValidator
 from typing import List
 import random
+from utils.log import Log
 
-@remote
+@remote(num_gpus=1)
 class TraditionalFederatedLearningServer(FederatedNode):
-    def __init__(self, node_id: str, role: str, federation_id: str, config: 'ConfigValidator') -> None:
-        super().__init__(node_id=node_id, role=role, config=config, federation_id=federation_id)
+    def __init__(self, node_id: str, role: str, config: 'ConfigValidator', log: 'Log') -> None:
+        super().__init__(node_id=node_id, role=role, config=config, log=log)
         self.federated_learning_rounds = None
         self.model = None
         self.number_of_clients = None
         self.clients_id_list = []
         self.device = 'cpu'
 
-        self.server_aggregator = TraditionalFederatedLearningAggregator(config)
+        self.server_aggregator = FedAvgAggregator(config=config,
+                                                  log=log,
+                                                  use_sample_scaling=False,
+                                                  n_samples=config.NUMBER_OF_CLIENTS)
+
+    def train(self, verbose=False, **kwargs):
+        if verbose:
+            print("Starting federated training")
+        self.build()
+        self.run()
 
     def build(self):
         """Initialize server components"""
@@ -34,51 +44,36 @@ class TraditionalFederatedLearningServer(FederatedNode):
     def run(self):
         """Main federated learning execution loop"""
         for _ in range(self.federated_learning_rounds):
-            # Sample clients for this round
-            client_sample = self.sample_clients(
-                client_sampling_rate=self.config.CLIENT_SAMPLING_RATE
-            )
 
             # Prepare and send global model to clients
-            self.server_aggregator.set_iteration(client_sample)
-            self._send_model_to_clients(client_sample)
+            # self.server_aggregator.set_iteration(client_sample)
+            self._send_model_to_clients(self.clients_id_list)
 
             # Collect client updates
             while not self.server_aggregator.ready:
-                message = self.get_message(block=True)
+                message = self.server_aggregator(self.neighbors)
                 self.on_client_receive(message)
 
             # Update global model with aggregated parameters
-            aggregated_state = self.server_aggregator.aggregate()
+            aggregated_state = self.server_aggregator.compute()
             self.model.load_state_dict(aggregated_state["state"])
-
-    def train(self, verbose=False, **kwargs):
-        if verbose:
-            print("Starting federated training")
-        self.build()
-        self.run()
 
     def _send_model_to_clients(self, client_sample: List[str]):
         """Send current global model to selected clients with necessary parameters"""
         message_body = {
             "state": self.model.state_dict(),
-            "hyperparams": {
-                "mu": 0.1  # just relevant for FedProx, TODO: read from config
-            }
         }
         self.send(header="model_update", body=message_body, to=client_sample)
 
-    def on_client_receive(self, message):
+    def on_client_receive(self, message: Message):
         """Handle incoming client updates"""
-        client_id = message.sender
+        client_id = message.sender_id
         client_state = message.body["state"]
-        n_samples = message.body["n_samples"]
 
         self.server_aggregator.update(
             client_id=client_id,
             client_dict={
                 "state": client_state,
-                "n_samples": n_samples
             }
         )
 

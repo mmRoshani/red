@@ -1,5 +1,5 @@
-device: 'cuda'
-gpu_index: 0
+device: 'cpu'
+gpu_index: ""
 
 federation_id: '1.x.y'
 # TraditionalFederatedLearning | ClusterFederatedLearningSchema
@@ -27,7 +27,7 @@ aggregation_strategy: "FedAvg"
 aggregation_sample_scaling: false
 
 distance_metric_on_parameters: true
-number_of_epochs: 10
+number_of_epochs: 1
 train_batch_size: null
 test_batch_size: null
 transform_input_size: null

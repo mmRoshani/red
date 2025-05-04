@@ -5,7 +5,7 @@ from ray.util.placement_group import PlacementGroup
 from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
 
 from validators.config_validator import ConfigValidator
-
+from utils.log import Log
 
 class VirtualNode(object):
 
@@ -22,6 +22,7 @@ class VirtualNode(object):
         id: str,
         role: str,
         config: 'ConfigValidator',
+        log: Log,
     ) -> None:
         """Creates a new VirtualNode object.
 
@@ -36,6 +37,7 @@ class VirtualNode(object):
         self.id = id
         self.role = role
         self.config = config
+        self.log = log
         self.handle: object = None # FederatedBase
 
     def build(self, bundle_idx: int, placement_group: PlacementGroup):
@@ -57,7 +59,7 @@ class VirtualNode(object):
                 placement_group, placement_group_bundle_index=bundle_idx
             ),
         ).remote(
-            node_id=self.id, role=self.role, config=self.config, federation_id=self.fed_id,
+            node_id=self.id, role=self.role, config=self.config, log=self.log
         )
 
     @property

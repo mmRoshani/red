@@ -1,7 +1,7 @@
-from core.aggregator.fed_avg_aggregator_base import FedAvgBase
+from core.aggregator.fed_avg_aggregator_base import FedAvgAggregator
 
 
-class FedProxBase(FedAvgBase):
+class FedProxBase(FedAvgAggregator):
     """Inherits FedAvg aggregation but adds client-side regularization capability"""
 
     def __init__(self, mu: float = 0.1, use_sample_scaling: bool = True):

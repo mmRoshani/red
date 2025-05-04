@@ -15,7 +15,7 @@ from core.federated.federated_base import FederatedBase
 from core.federated.federated_node import FederatedNode
 from core.federated.virtual_node import VirtualNode
 from validators.config_validator import ConfigValidator
-
+from utils.log import Log
 
 class TraditionalFederatedLearningSchema(FederatedBase):
     """
@@ -31,6 +31,7 @@ class TraditionalFederatedLearningSchema(FederatedBase):
         client_template: Type[FederatedNode],
         roles: List[str],
         config: 'ConfigValidator',
+        log: Log,
         server_id: str = "server",
         resources: Union[str, PlacementGroup] = "uniform",
         is_tune: bool = False,
@@ -62,6 +63,7 @@ class TraditionalFederatedLearningSchema(FederatedBase):
         Raises:
             ValueError: If the number of clients does not match the number of roles.
         """
+        self.log = log
         self.config = config
         n_clients_or_ids: Union[int, List[str]] = self.config.NUMBER_OF_CLIENTS
         if isinstance(n_clients_or_ids, int):
@@ -71,12 +73,12 @@ class TraditionalFederatedLearningSchema(FederatedBase):
 
         nodes = [
             VirtualNode(
-                server_template, server_id, "train", self.config,
+                server_template, server_id, "train", self.config, self.log
             )
         ]
         for c_id, role in zip(c_ids, roles):
             nodes.append(
-                VirtualNode(client_template, c_id, role, self.config)
+                VirtualNode(client_template, c_id, role, self.config, self.log)
             )
 
         super(TraditionalFederatedLearningSchema, self).__init__(
@@ -114,6 +116,7 @@ class TraditionalFederatedLearningSchema(FederatedBase):
                 [node.id for node in train_nodes], self._topology
             )
         )
+        # ray.get([node.handle._setup_train.remote() for node in train_nodes])
         ray.get([node.handle._setup_train.remote() for node in train_nodes])
 
         server_args = [server_args]

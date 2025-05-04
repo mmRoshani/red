@@ -4,19 +4,15 @@ from nets.network_factory import network_factory
 import copy
 from typing import Dict
 import torch
-from schemas.traditional_federated_learning.traditional_federated_learning_aggregator import \
-    TraditionalFederatedLearningAggregator
 from utils.checker import device_checker
 from utils.get_last_char_as_int import get_last_char_as_int
 from validators.config_validator import ConfigValidator
-from typing import List
-import random
+from utils.log import Log
 
-
-@remote
+@remote(num_gpus=1)
 class TraditionalFederatedLearningClient(FederatedNode):
-    def __init__(self, node_id: str, role: str, config: 'ConfigValidator', federation_id: str,) -> None:
-        super().__init__(node_id=node_id, role=role, config=config, federation_id=federation_id)
+    def __init__(self, node_id: str, role: str, config: 'ConfigValidator', log: Log) -> None:
+        super().__init__(node_id=node_id, role=role, config=config, log=log)
         self.model = None
         self.local_epochs = None
         self.train_loader = None
@@ -58,9 +54,8 @@ class TraditionalFederatedLearningClient(FederatedNode):
                     header="client_update",
                     body={
                         "state": local_state,
-                        "n_samples": len(self.train_loader.dataset)
                     },
-                    to=message.sender
+                    to=message.sender_id
                 )
 
     def train(self, optimizer_fn, loss_fn) -> Dict:

@@ -342,6 +342,9 @@ class ConfigValidator:
 
     def _device(self, device, gpu_index) -> str:
 
+        if device == "cpu":
+            return device
+
         if gpu_index is not None:
             device = torch.device(f"cuda:{gpu_index}")
 

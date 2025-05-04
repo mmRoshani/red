@@ -11,6 +11,7 @@ from typing import Union
 
 import ray
 
+from utils.log import Log
 from core.communication.message import Message
 from core.communication.topology_manager import TopologyManager
 from utils.exceptions import EndProcessException
@@ -20,7 +21,7 @@ from validators.config_validator import ConfigValidator
 
 class FederatedNode(object):
 
-    def __init__(self, node_id: str, role: str, config: 'ConfigValidator', federation_id: str = ""):
+    def __init__(self, node_id: str, role: str, config: 'ConfigValidator', log=Log):
         """Creates a node in the federation. Must not be called directly or overridden.
 
         Args:
@@ -32,8 +33,10 @@ class FederatedNode(object):
                 Defaults to "".
             **build_args: Additional arguments to be passed to the build function.
         """
+        self.config = config
+
         # Node hyperparameters
-        self._fed_id: str = federation_id
+        self._fed_id: str = self.config.FEDERATION_ID
         self._id: str = node_id
         self._role: str = role
 
@@ -46,8 +49,8 @@ class FederatedNode(object):
         self._version_buffer: Queue = None
         self._node_metrics: Dict[str, Any] = {}
 
+        self.log = log
         # Buildup function
-        self.config = config
         self.build()
 
     def build(self):

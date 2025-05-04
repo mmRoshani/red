@@ -1,49 +1,36 @@
-from typing import Dict, List, Optional
-
+from typing import Dict, Optional, List
+from utils.log import Log
 from core.aggregator.aggregator_base import AggregatorBase
+from validators.config_validator import ConfigValidator
 
 
-class FedAvgBase(AggregatorBase):
-    def __init__(self, use_sample_scaling: bool = False):
-        self.use_sample_scaling = use_sample_scaling  # Configurable scaling
+class FedAvgAggregator(AggregatorBase):
+    def __init__(self, config: 'ConfigValidator', log: 'Log', use_sample_scaling: bool = False, n_samples: int = 0):
+        super().__init__(config, log)
+        self.use_sample_scaling = use_sample_scaling
         self.client_ids: Dict[str, bool] = {}
         self.state_dict: Optional[Dict] = None
-        self.n_samples: int = 0  # Only used if use_sample_scaling=True
+        self.n_samples: int = 0
 
-    def set_iteration(self, client_ids: List[str]) -> None:
-        self.client_ids = {c_id: False for c_id in client_ids}
-        self.state_dict = None
-        self.n_samples = 0
-
-    def update(self, client_id: str, client_dict: Dict) -> None:
-        local_state = client_dict["state"]
-
-        if self.use_sample_scaling:
-            local_n = client_dict["n_samples"]
-            scaled_state = {k: v * local_n for k, v in local_state.items()}
-            self.n_samples += local_n
+        if not self.use_sample_scaling or n_samples == 0:
+            self.n_samples = self.config.NUMBER_OF_CLIENTS
         else:
-            scaled_state = local_state  # No scaling
+            self.n_samples = n_samples
 
-        if self.state_dict is None:
-            self.state_dict = {k: v.clone() for k, v in scaled_state.items()}
-        else:
-            for key in scaled_state:
-                self.state_dict[key] += scaled_state[key]
+        self.log.info(f'number of clients for aggregation: {self.n_samples}')
 
-        self.client_ids[client_id] = True
+    def update(self, client_dict: Dict):
+        n_samples = client_dict.pop("n_samples")
+        self.state["n_samples"] += n_samples
+        for k in client_dict:
+            self.state[k] += client_dict[k] * n_samples
 
-    def aggregate(self) -> Dict:
-        if self.state_dict is None:
-            return {"state": {}}
-
-        if self.use_sample_scaling:
-            divisor = self.n_samples if self.n_samples > 0 else 1
-        else:
-            divisor = len(self.client_ids)  # Simple average
-
-        return {"state": {k: v / divisor for k, v in self.state_dict.items()}}
+    def compute(self):
+        n_samples = self.state["n_samples"]
+        return {k: self.state[k] / n_samples for k in self.state}
 
     @property
-    def ready(self) -> bool:
-        return all(self.client_ids.values())
+    def ready(self):
+        return all(
+            [(expected in self.received_clients) for expected in self.expected_clients]
+        )
