@@ -1,3 +1,4 @@
+from core.communication.broker import FedRayBroker
 from core.federated.virtual_node import VirtualNode
 from utils.checker import device_checker
 from utils.log import Log
@@ -7,7 +8,6 @@ from ray.util.placement_group import PlacementGroup
 import threading
 from typing import Dict, List, Literal, Optional, Union
 from core.communication.message import Message
-from core.communication.topology_manager import TopologyManager
 from utils.resources import get_resources_split
 from validators.config_validator import ConfigValidator
 
@@ -95,7 +95,7 @@ class FederatedBase(object):
             self._pg = ray.util.get_current_placement_group()
         self._bundle_offset = 1 + bundle_offset if is_tune else bundle_offset
 
-        self._tp_manager: TopologyManager = None
+        self._tp_manager: FedRayBroker = None
         self._state: Literal["IDLE", "RUNNING"] = "IDLE"
         self._runtime_remotes: List[ray.ObjectRef] = None
         self._runtime: threading.Thread = None
@@ -177,7 +177,7 @@ class FederatedBase(object):
             to = [to]
 
         msg = Message(header=header, sender_id=self._name, body=body)
-        ray.get([self._tp_manager.forward.remote(msg, to)])
+        ray.get([self._tp_manager.publish.remote(msg, to)])
 
     def stop(self) -> None:
         """Stops the federation."""

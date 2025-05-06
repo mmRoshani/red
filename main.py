@@ -1,11 +1,9 @@
-from transformers.models.auto.image_processing_auto import model_type
 import os
-# from core.federated.client import Client
 from data.data_driven_clustering import compute_data_driven_clustering
 from data.load_and_prepare_data import load_and_prepare_data
 from schemas import schema_factory
+from utils.client_ids_list import client_ids_list_generator
 from utils.framework_setup import FrameworkSetup
-from utils.generate_list import generate_list
 from utils.log import Log
 from utils.log_path import log_path
 from utils.variable_name import var_name
@@ -55,7 +53,7 @@ def main(config_yaml_path: str = "./config.yaml"):
 
 
     log.info("----------    runtime configurations  --------------------------------------------------")
-    clients_id_list = generate_list(count=config.NUMBER_OF_CLIENTS, log=log)
+    clients_id_list = client_ids_list_generator(config.NUMBER_OF_CLIENTS, log=log)
 
     config.RUNTIME_COMFIG = RuntimeConfig(
         clients_id_list=clients_id_list,
@@ -92,6 +90,4 @@ def main(config_yaml_path: str = "./config.yaml"):
 # server = Server(Net)
 
 if __name__ == "__main__":
-    os.environ["RAY_DEDUP_LOGS"] = "0"
-
     typer.run(main)

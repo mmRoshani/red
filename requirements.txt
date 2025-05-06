@@ -26,4 +26,6 @@ numpy~=1.26.4
 torchvision~=0.20.1+cu121
 timm~=1.0.15
 
-ray[serve-grpc, tune, serve]
+ray[default]
+ debugpy
+

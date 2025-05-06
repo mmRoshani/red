@@ -7,3 +7,11 @@ PLOT_PATH: str = './plots'
 # RESOURCES
 TOPOLOGY_MANAGER_CPU_RESOURCES: float | int = 0.5
 SAFETY_EPSILON: float= 0.01
+
+# Algorithm
+SERVER_ID: str = "server"
+
+# Communication
+MODEL_UPDATE: str = "model_update"
+
+MESSAGE_BODY_STATES = "state"

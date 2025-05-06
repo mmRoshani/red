@@ -1,36 +1,53 @@
 from typing import Dict, Optional, List
+import torch
+from constants.framework import MODEL_UPDATE, MESSAGE_BODY_STATES
+from core.communication.message import Message
 from utils.log import Log
 from core.aggregator.aggregator_base import AggregatorBase
 from validators.config_validator import ConfigValidator
+from collections import defaultdict
 
 
 class FedAvgAggregator(AggregatorBase):
-    def __init__(self, config: 'ConfigValidator', log: 'Log', use_sample_scaling: bool = False, n_samples: int = 0):
+    def __init__(self, config: 'ConfigValidator', log: 'Log'):
         super().__init__(config, log)
-        self.use_sample_scaling = use_sample_scaling
         self.client_ids: Dict[str, bool] = {}
         self.state_dict: Optional[Dict] = None
-        self.n_samples: int = 0
 
-        if not self.use_sample_scaling or n_samples == 0:
-            self.n_samples = self.config.NUMBER_OF_CLIENTS
-        else:
-            self.n_samples = n_samples
+    def update(self,msg: Message):
+        sender_id = msg.sender_id
+        if sender_id not in self.expected_clients:
+            raise ValueError(
+                f"Message received from client {sender_id}, not included in the expected clients."
+            )
+        self.received_clients.append(sender_id)
+        self.states[sender_id] = msg.body[MESSAGE_BODY_STATES]
+        self.log.info(f'received message from client {sender_id} for aggregation')
 
-        self.log.info(f'number of clients for aggregation: {self.n_samples}')
+    def compute(self) -> Dict[str, torch.Tensor]:
+        """Averages the state dictionaries received from clients."""
 
-    def update(self, client_dict: Dict):
-        n_samples = client_dict.pop("n_samples")
-        self.state["n_samples"] += n_samples
-        for k in client_dict:
-            self.state[k] += client_dict[k] * n_samples
+        valid_states = [state for state in self.states.values() if state is not None]
+        num_valid_clients = len(valid_states)
 
-    def compute(self):
-        n_samples = self.state["n_samples"]
-        return {k: self.state[k] / n_samples for k in self.state}
+        if num_valid_clients == 0:
+            self.log.info("number of received client updates is 0")
+            return {}
+
+        aggregated_state = defaultdict(
+            lambda: torch.zeros_like(list(valid_states[0].values())[0]))  # Initialize with zeros
+
+        for client_state in valid_states:
+            for key, value in client_state.items():
+                aggregated_state[key] += value
+
+        for key in aggregated_state:
+            aggregated_state[key] = aggregated_state[key] / num_valid_clients
+
+        return dict(aggregated_state)
 
     @property
     def ready(self):
-        return all(
-            [(expected in self.received_clients) for expected in self.expected_clients]
-        )
+        _client_readiness_list = [(expected in self.received_clients) for expected in self.expected_clients]
+        self.log.info(f'client readiness list is {_client_readiness_list}')
+        return all(_client_readiness_list)

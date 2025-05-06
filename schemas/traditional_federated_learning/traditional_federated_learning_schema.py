@@ -10,13 +10,13 @@ import numpy as np
 import ray
 from ray.util.placement_group import PlacementGroup
 
-from core.communication.topology_manager import _get_or_create_topology_manager
 from core.federated.federated_base import FederatedBase
 from core.federated.federated_node import FederatedNode
 from core.federated.virtual_node import VirtualNode
+from utils.client_ids_list import client_ids_list_generator
 from validators.config_validator import ConfigValidator
 from utils.log import Log
-
+from core.communication.broker import _get_or_create_broker
 class TraditionalFederatedLearningSchema(FederatedBase):
     """
     A TraditionalFederatedLearningSchema is a special type of Federation that implements a federated
@@ -67,7 +67,7 @@ class TraditionalFederatedLearningSchema(FederatedBase):
         self.config = config
         n_clients_or_ids: Union[int, List[str]] = self.config.NUMBER_OF_CLIENTS
         if isinstance(n_clients_or_ids, int):
-            c_ids = [f"client_{i}" for i in range(n_clients_or_ids)]
+            c_ids = client_ids_list_generator(n_clients_or_ids, self.log)
         else:
             c_ids = n_clients_or_ids
 
@@ -101,7 +101,7 @@ class TraditionalFederatedLearningSchema(FederatedBase):
                 training session is finished. Defaults to False.
         """
         if self._tp_manager is None:
-            self._tp_manager = _get_or_create_topology_manager(
+            self._tp_manager = _get_or_create_broker(
                 self._pg, self._fed_id, self._bundle_offset
             )
         train_nodes = []
@@ -112,11 +112,10 @@ class TraditionalFederatedLearningSchema(FederatedBase):
                 train_nodes.append(node)
 
         ray.get(
-            self._tp_manager.build_network.remote(
+            self._tp_manager.link_nodes.remote(
                 [node.id for node in train_nodes], self._topology
             )
         )
-        # ray.get([node.handle._setup_train.remote() for node in train_nodes])
         ray.get([node.handle._setup_train.remote() for node in train_nodes])
 
         server_args = [server_args]

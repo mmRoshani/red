@@ -1,3 +1,10 @@
+import os
+
+from constants.framework import SERVER_ID
+
+os.environ["RAY_DEDUP_LOGS"] = "0"
+os.environ["RAY_DEDUP_LOGS_AGG_WINDOW_S"] = "4"
+
 import ray
 import time
 
@@ -12,27 +19,27 @@ from validators.config_validator import ConfigValidator
 from utils.log import Log
 import torch
 
-
 def traditional_federated_learning_executor(config: ConfigValidator, log: Log):
-    ray.init(num_gpus=1)
+
+    ray.init()
 
     federation = TraditionalFederatedLearningSchema(
         server_template=TraditionalFederatedLearningServer,
         client_template=TraditionalFederatedLearningClient,
-        roles=[config.CLIENT_ROLE for _ in range(config.NUMBER_OF_CLIENTS+1)],
+        roles=[config.CLIENT_ROLE for _ in range(config.NUMBER_OF_CLIENTS)],
         config=config,
         log=log,
         resources="uniform",
-        server_id='server'
+        server_id=SERVER_ID,
     )
 
     federation.train(
         server_args={},
         client_args={"optimizer_fn": torch.optim.SGD, "loss_fn": torch.nn.CrossEntropyLoss,},
-        blocking=True
+        blocking=False,
     )
 
-    for _ in range(4):
+    for _ in range(config.NUMBER_OF_CLIENTS):
         version = federation.pull_version()
         print(version)
     time.sleep(3)

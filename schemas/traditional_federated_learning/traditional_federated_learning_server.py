@@ -1,15 +1,19 @@
+import torch
+
+from constants.framework import MODEL_UPDATE
 from core.aggregator.fed_avg_aggregator_base import FedAvgAggregator
 from core.communication.message import Message
 from core.federated import FederatedNode
 from decorators.remote import remote
 from nets.network_factory import network_factory
 from utils.checker import device_checker
+from utils.client_ids_list import client_ids_list_generator
 from validators.config_validator import ConfigValidator
 from typing import List
 import random
 from utils.log import Log
 
-@remote(num_gpus=1)
+@remote(num_gpus=1, num_cpus=1)
 class TraditionalFederatedLearningServer(FederatedNode):
     def __init__(self, node_id: str, role: str, config: 'ConfigValidator', log: 'Log') -> None:
         super().__init__(node_id=node_id, role=role, config=config, log=log)
@@ -18,11 +22,7 @@ class TraditionalFederatedLearningServer(FederatedNode):
         self.number_of_clients = None
         self.clients_id_list = []
         self.device = 'cpu'
-
-        self.server_aggregator = FedAvgAggregator(config=config,
-                                                  log=log,
-                                                  use_sample_scaling=False,
-                                                  n_samples=config.NUMBER_OF_CLIENTS)
+        self.server_aggregator: FedAvgAggregator = None
 
     def train(self, verbose=False, **kwargs):
         if verbose:
@@ -40,42 +40,43 @@ class TraditionalFederatedLearningServer(FederatedNode):
             pretrained=self.config.PRETRAINED_MODELS).to(self.device)
         self.number_of_clients = self.config.NUMBER_OF_CLIENTS
         self.clients_id_list = self.config.RUNTIME_COMFIG.clients_id_list
+        self.server_aggregator = FedAvgAggregator(config=self.config, log=self.log)
 
     def run(self):
         """Main federated learning execution loop"""
-        for _ in range(self.federated_learning_rounds):
+        for fl_round in range(self.federated_learning_rounds):
 
             # Prepare and send global model to clients
             # self.server_aggregator.set_iteration(client_sample)
-            self._send_model_to_clients(self.clients_id_list)
+            if fl_round == 0:
+                self._send_model_to_clients(self.clients_id_list)
+                self.log.info(f"send initial model to clients")
+            else:
+                self.log.info(f'this is the server side beginning og federated round number {fl_round}')
+                self.server_aggregator.setup(self.neighbors)
 
-            # Collect client updates
-            while not self.server_aggregator.ready:
-                message = self.server_aggregator(self.neighbors)
-                self.on_client_receive(message)
+                # Collect client updates
+                while not self.server_aggregator.ready:
+                    client_message = self.receive(block=True)
+                    if (client_message is not None) and (client_message.header == MODEL_UPDATE):
+                        self.server_aggregator.update(client_message)
 
-            # Update global model with aggregated parameters
-            aggregated_state = self.server_aggregator.compute()
-            self.model.load_state_dict(aggregated_state["state"])
+                    else:
+                        self.log.warn(
+                            f'received message with id of {client_message.sender_id} and header of {client_message.header}')
+
+                self.log.info(f">>>>>>>>>>>>>>>>>>>>ready for aggregation")
+
+                # Update global model with aggregated parameters
+                aggregated_state = self.server_aggregator.compute()
+                self.model.load_state_dict(aggregated_state["state"])
 
     def _send_model_to_clients(self, client_sample: List[str]):
         """Send current global model to selected clients with necessary parameters"""
         message_body = {
-            "state": self.model.state_dict(),
+            "state": self.model.to('cpu').state_dict(),
         }
-        self.send(header="model_update", body=message_body, to=client_sample)
-
-    def on_client_receive(self, message: Message):
-        """Handle incoming client updates"""
-        client_id = message.sender_id
-        client_state = message.body["state"]
-
-        self.server_aggregator.update(
-            client_id=client_id,
-            client_dict={
-                "state": client_state,
-            }
-        )
+        self.send(header=MODEL_UPDATE, body=message_body, to=client_sample)
 
     def sample_clients(self, client_sampling_rate: float, random_seed: int = 42) -> List[str]:
         random.seed(random_seed)

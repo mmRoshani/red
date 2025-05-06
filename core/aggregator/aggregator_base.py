@@ -14,26 +14,20 @@ class AggregatorBase(ABC):
         self.expected_clients = []
         self.received_clients = []
         self.residual_ids = []
-        self.state = defaultdict(lambda: 0)
+        self.states = defaultdict(lambda: 0)
 
     def setup(self, client_ids: List[str]):
         self.expected_clients = deepcopy(client_ids)
-        self.received_clients = []
-        self.state = defaultdict(lambda: 0)
+        self.received_clients = [False] * len(client_ids)
 
-    def __call__(self, msg):
-        if msg.sender_id not in self.expected_clients:
-            raise ValueError(
-                f"Message received from client {msg.sender_id}, not included in the expected clients."
-            )
-        self.received_clients.append(msg.sender_id)
-        self.update(msg.body)
+        for client_id in self.expected_clients:
+            self.states.update({client_id: None})
 
     def update(self, client_dict: Dict):
         raise NotImplementedError
 
-    def compute(self):
-        return self.state
+    def compute(self) -> defaultdict:
+        raise NotImplementedError
 
     @property
     def ready(self):
