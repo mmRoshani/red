@@ -62,32 +62,9 @@ def main(config_yaml_path: str = "./config.yaml"):
         log=log
     )
 
-
     log.info("----------    Schema  Factory --------------------------------------------------")
     schema_runner_fn = schema_factory(config.FEDERATED_LEARNING_SCHEMA ,log)
     schema_runner_fn(config, log)
-
-#     log.info("----------    initializing Clients    --------------------------------------------------")
-#     client_list = [i for i in range(config.NUMBER_OF_CLIENTS)]
-#
-#     assert len(client_list) == config.NUMBER_OF_CLIENTS
-#
-#     clients = [
-#         Client(
-#             Net,
-#             # lambda x : torch.optim.Adam(x, lr=0.001,  amsgrad=True),
-#             lambda x: torch.optim.SGD(
-#                 x, lr=0.001, momentum=0.9, weight_decay=1e-4
-#                 # x, lr=0.001, momentum=0.9,
-#             ),  #! we have to use SGD since our base papers also tested their methods via SGD
-#             i,
-#             train_loaders[i],
-#             test_loaders[i],
-#         )
-#         for i in client_list
-#     ]
-#
-# server = Server(Net)
 
 if __name__ == "__main__":
     typer.run(main)

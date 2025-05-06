@@ -69,7 +69,10 @@ class TraditionalFederatedLearningServer(FederatedNode):
 
                 # Update global model with aggregated parameters
                 aggregated_state = self.server_aggregator.compute()
-                self.model.load_state_dict(aggregated_state["state"])
+                self.model.load_state_dict(aggregated_state)
+
+                self._send_model_to_clients(self.clients_id_list)
+                self.log.info(f"send aggregated model to clients")
 
     def _send_model_to_clients(self, client_sample: List[str]):
         """Send current global model to selected clients with necessary parameters"""

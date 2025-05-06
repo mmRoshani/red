@@ -25,12 +25,8 @@ class FedRayBroker:
             ids = self.get_neighbors(msg.sender_id)
         else:
             neighbors = self.get_neighbors(msg.sender_id)
-            print(neighbors)
-            print(ids)
             for curr_id in ids:
                 if not curr_id in neighbors:
-                    print(curr_id)
-                    print(msg.sender_id)
                     raise ValueError(f"{curr_id} is not a neighbor of {msg.sender_id}")
         msg_ref = ray.put(msg)
         return ray.get([self._nodes[neigh].enqueue.remote(msg_ref) for neigh in ids])

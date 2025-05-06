@@ -25,29 +25,28 @@ class FedAvgAggregator(AggregatorBase):
         self.log.info(f'received message from client {sender_id} for aggregation')
 
     def compute(self) -> Dict[str, torch.Tensor]:
-        """Averages the state dictionaries received from clients."""
-
-        valid_states = [state for state in self.states.values() if state is not None]
-        num_valid_clients = len(valid_states)
-
-        if num_valid_clients == 0:
-            self.log.info("number of received client updates is 0")
+        valid_states = [s for s in self.states.values() if s is not None]
+        n = len(valid_states)
+        if n == 0:
+            self.log.info("no client updates")
             return {}
 
-        aggregated_state = defaultdict(
-            lambda: torch.zeros_like(list(valid_states[0].values())[0]))  # Initialize with zeros
+        aggregated_state: Dict[str, torch.Tensor] = {}
 
         for client_state in valid_states:
-            for key, value in client_state.items():
-                aggregated_state[key] += value
+            for k, v in client_state.items():
+                if k not in aggregated_state:
+                    aggregated_state[k] = torch.zeros_like(v)
+                aggregated_state[k] += v
 
-        for key in aggregated_state:
-            aggregated_state[key] = aggregated_state[key] / num_valid_clients
+        for k in aggregated_state:
+            aggregated_state[k] /= n
 
-        return dict(aggregated_state)
+        return aggregated_state
 
     @property
     def ready(self):
         _client_readiness_list = [(expected in self.received_clients) for expected in self.expected_clients]
         self.log.info(f'client readiness list is {_client_readiness_list}')
+
         return all(_client_readiness_list)

@@ -76,12 +76,19 @@ class TraditionalFederatedLearningClient(FederatedNode):
         server_init_message: Message = self.receive(block=True)
         if (server_init_message is not None) and (server_init_message.header == MODEL_UPDATE):
             local_model.load_state_dict(server_init_message.body['state'])
-            self.model = copy.deepcopy(local_model)
+            local_model.to(self.device)
+            # self.model = copy.deepcopy(local_model)
             self.log.info(f'received initial model from server for client {self.id}')
             self.log.info(f'start training loop')
 
             while True:
+
                 local_model = self.epoch_trainer(local_model=local_model)
                 self.send_local_model_to_server(local_model)
+
+                aggregated_message: Message = self.receive(block=True)
+                local_model.load_state_dict(aggregated_message.body['state'])
+                local_model.to(self.device)
+
         else:
             self.log.warn(f'received message with id of {server_init_message.sender_id} and header of {server_init_message.header}')

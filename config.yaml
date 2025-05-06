@@ -27,10 +27,10 @@ aggregation_strategy: "FedAvg"
 aggregation_sample_scaling: false
 
 distance_metric_on_parameters: true
-number_of_epochs: 1
-train_batch_size: null
-test_batch_size: null
-transform_input_size: null
+number_of_epochs: 3
+train_batch_size: 28
+test_batch_size: 28
+transform_input_size: 28
 weight_decay: null
 
 number_of_clients: 10
@@ -42,3 +42,4 @@ federated_learning_rounds: 10
 stop_avg_accuracy: 1.0
 save_before_aggregation_models: false
 save_global_models: false
+
