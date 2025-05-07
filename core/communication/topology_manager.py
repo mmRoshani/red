@@ -2,16 +2,16 @@ import ray
 import networkx as nx
 import numpy as np
 
+from constants.framework import TOPOLOGY_MANAGER_CPU_RESOURCES
 from .message import Message
 from typing import Dict, List, Optional, Union
 from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
 
 
-BROKER_CPU_RESOURCES = 0.05
 
 
-@ray.remote(num_cpus=BROKER_CPU_RESOURCES, max_concurrency=100)
-class FedRayBroker:
+@ray.remote(num_cpus=TOPOLOGY_MANAGER_CPU_RESOURCES, max_concurrency=100)
+class TopologyManager:
     def __init__(self, federation_id: str) -> None:
         self._fed_id = federation_id
 
@@ -53,10 +53,10 @@ class FedRayBroker:
 
 def _get_or_create_broker(
     placement_group, federation_id: str, bundle_offset: int
-) -> FedRayBroker:
-    return FedRayBroker.options(
+) -> TopologyManager:
+    return TopologyManager.options(
         name=federation_id + "/broker",
-        num_cpus=BROKER_CPU_RESOURCES,
+        num_cpus=TOPOLOGY_MANAGER_CPU_RESOURCES,
         scheduling_strategy=PlacementGroupSchedulingStrategy(
             placement_group, placement_group_bundle_index=0 + bundle_offset
         ),

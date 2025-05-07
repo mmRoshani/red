@@ -16,7 +16,7 @@ from core.federated.virtual_node import VirtualNode
 from utils.client_ids_list import client_ids_list_generator
 from validators.config_validator import ConfigValidator
 from utils.log import Log
-from core.communication.broker import _get_or_create_broker
+from core.communication.topology_manager import _get_or_create_broker
 class TraditionalFederatedLearningSchema(FederatedBase):
     """
     A TraditionalFederatedLearningSchema is a special type of Federation that implements a federated

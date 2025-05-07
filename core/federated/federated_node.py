@@ -13,7 +13,7 @@ import ray
 from core.communication.queue import Queue
 from utils.log import Log
 from core.communication.message import Message
-from core.communication.broker import FedRayBroker
+from core.communication.topology_manager import TopologyManager
 from utils.exceptions import EndProcessException
 from validators.config_validator import ConfigValidator
 
@@ -40,7 +40,7 @@ class FederatedNode(object):
         self._role: str = role
 
         # Communication interface
-        self._broker: FedRayBroker = None
+        self._broker: TopologyManager = None
         self._message_queue: Queue = None
 
         # Node's version

@@ -47,7 +47,6 @@ class TraditionalFederatedLearningServer(FederatedNode):
         for fl_round in range(self.federated_learning_rounds):
 
             # Prepare and send global model to clients
-            # self.server_aggregator.set_iteration(client_sample)
             if fl_round == 0:
                 self._send_model_to_clients(self.clients_id_list)
                 self.log.info(f"send initial model to clients")
@@ -65,7 +64,7 @@ class TraditionalFederatedLearningServer(FederatedNode):
                         self.log.warn(
                             f'received message with id of {client_message.sender_id} and header of {client_message.header}')
 
-                self.log.info(f">>>>>>>>>>>>>>>>>>>>ready for aggregation")
+                self.log.info(f"ready for aggregation in fl round {fl_round}")
 
                 # Update global model with aggregated parameters
                 aggregated_state = self.server_aggregator.compute()

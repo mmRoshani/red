@@ -1,4 +1,4 @@
-from core.communication.broker import FedRayBroker
+from core.communication.topology_manager import TopologyManager
 from core.federated.virtual_node import VirtualNode
 from utils.checker import device_checker
 from utils.log import Log
@@ -95,7 +95,7 @@ class FederatedBase(object):
             self._pg = ray.util.get_current_placement_group()
         self._bundle_offset = 1 + bundle_offset if is_tune else bundle_offset
 
-        self._tp_manager: FedRayBroker = None
+        self._tp_manager: TopologyManager = None
         self._state: Literal["IDLE", "RUNNING"] = "IDLE"
         self._runtime_remotes: List[ray.ObjectRef] = None
         self._runtime: threading.Thread = None
