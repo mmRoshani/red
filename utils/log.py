@@ -17,7 +17,7 @@ class Log:
                 os.remove(log_file)
                 print(f"Old log file '{log_file}' deleted.")
             except PermissionError as _:
-                print("Log file deletion can cause data lost, if you are sure please restart you session")
+                print("Log file deletion can cause datasets lost, if you are sure please restart you session")
 
         self.log_instance = logging.getLogger("SAFE_PFL_LOGGER")
         self.log_instance.setLevel(logging.DEBUG)

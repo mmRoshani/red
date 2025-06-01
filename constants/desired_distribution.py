@@ -1,4 +1,4 @@
-#! N20 new data distribution (for test)
+#! N20 new datasets distribution (for test)
 N20_FMNIST_DESIRED_DISTRIBUTION = [
     [3448,2880,0,0,0,0,0,0,0,0],
     [0,1750,4046,0,0,0,0,0,0,0],
