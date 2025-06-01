@@ -1,6 +1,6 @@
 import os
-from data.data_driven_clustering import compute_data_driven_clustering
-from data.load_and_prepare_data import load_and_prepare_data
+from core.clustering.data_driven import calculate_label_distribution
+from data.load_and_prepare_data_base_on_type import determine_dataset_type
 from schemas import schema_factory
 from utils.client_ids_list import client_ids_list_generator
 from utils.framework_setup import FrameworkSetup
@@ -45,11 +45,11 @@ def main(config_yaml_path: str = "./config.yaml"):
     FrameworkSetup.path_setup(config)
 
     log.info("----------    data    distribution   --------------------------------------------------")
-    train_loaders, test_loaders = load_and_prepare_data(config, log)
+    train_loaders, test_loaders = determine_dataset_type(config, log)
 
     if config.PRE_COMPUTED_DATA_DRIVEN_CLUSTERING:
         log.info("clients train loader label distribution")
-        config = config | {"DATA_DRIVEN_CLUSTERING": compute_data_driven_clustering(train_loaders, config, log)}
+        # config = config | {"DATA_DRIVEN_CLUSTERING": compute_data_driven_clustering(train_loaders, config, log)}
 
 
     log.info("----------    runtime configurations  --------------------------------------------------")

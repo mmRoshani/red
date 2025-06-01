@@ -8,8 +8,6 @@ from typing import Dict, List, Optional, Union
 from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
 
 
-
-
 @ray.remote(num_cpus=TOPOLOGY_MANAGER_CPU_RESOURCES, max_concurrency=100)
 class TopologyManager:
     def __init__(self, federation_id: str) -> None:
@@ -34,6 +32,7 @@ class TopologyManager:
     def get_neighbors(self, node_id: str):
         return [neigh for neigh in self._graph.neighbors(node_id)]
 
+    # RvQ: Namana?
     def link_nodes(self, node_ids: List[str], topology: Union[str, np.ndarray]):
         if len(node_ids) < 2:
             raise ValueError("At least 2 nodes are required to setup the topology.")

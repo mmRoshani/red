@@ -16,8 +16,8 @@ def calculate_optimal_sensitivity_percentage(
         log: 'Log',
         plot_save_path = f'./{PLOT_PATH}'):
 
-    prune_rate = torch.linspace(0, 1, 101)
-    cosine_sim = []
+    prune_rate = torch.linspace(0, 1, 101) # RvQ: linespace?
+    cosine_sim = [] # RvQ: why vector?
     base_vec = vectorise_model_parameters(example_client_model)
 
     log.info("starting calculating optimal sensitivity percentage...")
@@ -38,6 +38,7 @@ def calculate_optimal_sensitivity_percentage(
 
     del dists
 
+    # RvQ: the fuck we be plotting here?
     plt.plot(
         prune_rate, cosine_sim, label=f'{config.MODEL_TYPE} Parateo Front'
     )

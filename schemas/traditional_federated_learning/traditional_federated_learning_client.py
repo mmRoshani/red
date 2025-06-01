@@ -1,6 +1,3 @@
-from keras.src.applications.efficientnet import block
-from tensorflow.tools.docs.doc_controls import header
-
 from constants.framework import MODEL_UPDATE, SERVER_ID, MESSAGE_BODY_STATES
 from core.communication.message import Message
 from core.federated import FederatedNode

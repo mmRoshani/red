@@ -28,6 +28,7 @@ class AggregatorBase(ABC):
 
     def compute(self) -> defaultdict:
         raise NotImplementedError
+    # RvQ: Used nowhere, why?
 
     @property
     def ready(self):

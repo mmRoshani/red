@@ -5,8 +5,9 @@ GLOBAL_MODELS_SAVING_PATH: str = f"{MODELS_SAVING_PATH}/after_aggregation"
 PLOT_PATH: str = './plots'
 
 # RESOURCES
-TOPOLOGY_MANAGER_CPU_RESOURCES: float | int = 0.5
-SAFETY_EPSILON: float= 0.01
+TOPOLOGY_MANAGER_CPU_RESOURCES: float | int = 0.5 # RvQ: TF?
+SAFETY_EPSILON: float= 0.01 # RvQ: TF???
+
 
 # Algorithm
 SERVER_ID: str = "server"

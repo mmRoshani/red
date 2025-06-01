@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import Dict
 
-
 @dataclass
 class Message:
     header: str = None

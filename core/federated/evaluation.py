@@ -1,7 +1,6 @@
 import torch
 from utils.checker import device_checker
 
-
 def model_evaluation(model, loader, device: str):
     device = device_checker(device)
 
