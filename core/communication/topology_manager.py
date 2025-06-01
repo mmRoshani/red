@@ -46,6 +46,28 @@ class TopologyManager:
         if isinstance(self._topology, str):
             if self._topology == "star":
                 self._graph = nx.star_graph(self._node_ids)
+            elif self._topology == "mesh":
+                self._graph = nx.complete_graph(self._node_ids)
+            elif self._topology == "ring":
+                self._topology = nx.cycle_graph(self._node_ids)
+            elif self._topology == "custom":
+                #self._graph = nx.from_numpy_array(np.array(self.adjacency_matrix))
+                '''
+                Some tips on how to make this more robust:
+                Check for the attribute of adjacency matrix like this maybe:
+                if hasattr(self, "adjacency_matrix"):
+                    self._graph = nx.from_numpy_array(np.array(self.adjacency_matrix))
+                else:
+                    raise ValueError("Custom topology requires 'adjacency_matrix' attribute.")
+                but here?
+                
+                Make sure adjacency_matrix is square and matches the number of nodes.
+
+                If your nodes have IDs other than 0, 1, ..., n-1, you’ll need to relabel the graph after creation
+                
+                       This goes here? |
+                                       V
+                '''
         elif isinstance(self._topology, np.ndarray):
             raise NotImplementedError
 

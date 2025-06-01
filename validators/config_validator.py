@@ -13,6 +13,8 @@ from constants.distances_constants import (
 from constants.federated_learning_schema_constants import TRADITIONAL_FEDERATED_LEARNING, CLUSTER_FEDERATED_LEARNING, \
     DECENTRALIZED_FEDERATED_LEARNING
 
+from constants.federated_learning_topology_constants import  STAR_TOPOLOGY, RING_TOPOLOGY, MESH_TOPOLOGY, CUSTOM_TOPOLOGY
+
 from constants.models_constants import (
     MODEL_CNN,
     MODEL_RESNET_18,
@@ -80,6 +82,7 @@ class ConfigValidator:
             distance_metric_on_parameters: bool = True,
             pretrained_models: bool = False,
             federated_learning_schema: str = None,
+            federated_learning_topology: str = None,
             client_role: str = None,
             client_sampling_rate: float = 1.0,
             aggregation_strategy: str = None,
@@ -127,6 +130,7 @@ class ConfigValidator:
         self.DISTANCE_METRIC_ON_PARAMETERS = distance_metric_on_parameters
         self.PRETRAINED_MODELS = pretrained_models
         self.FEDERATED_LEARNING_SCHEMA = self._federated_learning_schema(federated_learning_schema)
+        self.FEDERATED_LEARNING_TOPOLOGY = self._schem_n_toplogy_macher(federated_learning_schema, federated_learning_topology)
         self.CLIENT_ROLE = self._client_role(client_role)
         self.CLIENT_SAMPLING_RATE = client_sampling_rate
         self.AGGREGATION_STRATEGY = self._aggregation_strategy(aggregation_strategy)
@@ -380,6 +384,11 @@ class ConfigValidator:
         ]:
             raise TypeError(f"unknown federated_learning_schema type: {federated_learning_schema}")
         return federated_learning_schema
+
+    def _schem_n_toplogy_macher(self, federated_learning_schema: str, federated_learning_topology: str):
+        if federated_learning_schema == TRADITIONAL_FEDERATED_LEARNING and federated_learning_topology != STAR_TOPOLOGY:
+            raise TypeError(f"Traditional federated learning uses the star topology only!")
+        return federated_learning_topology
 
 
     def _client_role(self, client_role: str):
