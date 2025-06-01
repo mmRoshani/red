@@ -8,5 +8,5 @@ DATA_SET_TINY_IMAGE_NET = "tinyimagenet"
 DATA_SET_SHAKESPEARE = "shakespeare"
 DATA_SET_BBC = "bbc"
 
-SHAKESPEARE_RAW_DATA_PATH = "data/by_play_and_character"
+SHAKESPEARE_RAW_DATA_PATH = "datasets/by_play_and_character"
 SHAKESPEARE_TARGET_PATH = "shakespear_data/"

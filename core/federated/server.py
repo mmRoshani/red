@@ -59,9 +59,9 @@
 #
 #         with torch.no_grad():
 #             for param_name, param in avg_model.named_parameters():
-#                 param.data.zero_()
+#                 param.datasets.zero_()
 #                 for model in models:
-#                     param.data.add_(model.state_dict()[param_name].data / len(models))
+#                     param.datasets.add_(model.state_dict()[param_name].datasets / len(models))
 #
 #         return avg_model
 #

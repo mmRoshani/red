@@ -44,6 +44,6 @@ def check_train_test_class_mismatch(train_ds, test_ds):
     if mismatch_classes:
         print(f"Mismatch detected! Test classes not in train: {mismatch_classes}")
     else:
-        print("No mismatch: test classes are all present in training data.")
+        print("No mismatch: test classes are all present in training datasets.")
 
     return mismatch_classes
