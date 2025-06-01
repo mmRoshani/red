@@ -46,7 +46,7 @@ class TraditionalFederatedLearningClient(FederatedNode):
         }
         self.send(header=MODEL_UPDATE, body=message_body, to=SERVER_ID)
 
-    def epoch_trainer(self, local_model: NN):
+    def epoch_trainer(self, local_model: NN) -> NN:
         for epoch in range(self.local_epochs):
             for data, labels in self.train_loader:
                 data, labels = data.to(self.device), labels.to(self.device)
@@ -54,11 +54,12 @@ class TraditionalFederatedLearningClient(FederatedNode):
                 outputs = local_model(data)
                 loss = self.criterion(outputs, labels)
 
-                self.log.info(f'loss for client {self.id} is {loss}')
 
                 loss.backward()
                 self.optimizer.step()
-                return local_model
+            self.log.info(f'loss for client {self.id} is {loss}')
+
+        return local_model
 
     def train(self, optimizer_fn, loss_fn):
 
