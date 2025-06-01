@@ -67,4 +67,5 @@ def main(config_yaml_path: str = "./config.yaml"):
     schema_runner_fn(config, log)
 
 if __name__ == "__main__":
-    typer.run(main)
+    #typer.run(main)
+    main()
