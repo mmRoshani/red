@@ -7,6 +7,7 @@ from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
 from validators.config_validator import ConfigValidator
 from utils.log import Log
 
+
 class VirtualNode(object):
 
     """

@@ -23,3 +23,6 @@ def global_prune_without_masks(model, amount):
         if hasattr(mod, "bias_orig"):
             if isinstance(mod.bias_orig, torch.nn.Parameter):
                 prune.remove(mod, "bias")
+
+
+# RvQ: what's mod? L1Unstructured?

@@ -7,7 +7,6 @@ from core.aggregator.aggregator_base import AggregatorBase
 from validators.config_validator import ConfigValidator
 from collections import defaultdict
 
-
 class FedAvgAggregator(AggregatorBase):
     def __init__(self, config: 'ConfigValidator', log: 'Log'):
         super().__init__(config, log)

@@ -2,6 +2,7 @@ import copyreg, threading, pickle, queue, time
 from queue import Queue as _Queue
 from queue import Full
 
+
 # Make Queue a new-style class, so it can be used with copy_reg
 class Queue(_Queue, object):
     Empty = queue.Empty

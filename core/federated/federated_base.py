@@ -73,6 +73,8 @@ class FederatedBase(object):
             bundle_offset (int, optional): The bundle offset. This parameter is useful
                 whenever multiple federations need to be allocated within the same
                 PlacementGroup. Defaults to 0.
+        # RvQ: What is a placementGroup in the context of resources
+        # RvQ: TF is a bundle offset?
 
         Raises:
             ValueError: If the topology is not a valid topology.
@@ -83,6 +85,7 @@ class FederatedBase(object):
         self._nodes: List[VirtualNode] = nodes
         self._topology: Union[str, np.ndarray] = topology
         self.config: 'ConfigValidator' = config
+        # RvQ: TF is a federation id, and what's a supervisor
 
         if not is_tune:
             if isinstance(resources, str):
@@ -147,7 +150,7 @@ class FederatedBase(object):
             for node in self._nodes
             if node.id in to_pull
         ]
-
+        # RvQ: TF is to? what to pull?
         if timeout is None:
             new_versions = ray.get(to_pull)
             return new_versions[0] if len(to_pull) == 1 else new_versions
@@ -191,6 +194,7 @@ class FederatedBase(object):
         self._runtime.join()
         self._state = "IDLE"
 
+    # RvQ: Who is this property
     @property
     def running(self) -> bool:
         """Returns whether the federation is running a training process"""

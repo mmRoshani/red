@@ -32,6 +32,8 @@ class FederatedNode(object):
                 Defaults to "".
             **build_args: Additional arguments to be passed to the build function.
         """
+        # RvQ; How is multi role possible
+
         self.config = config
         self.log = log
         # Node hyperparameters
@@ -42,15 +44,18 @@ class FederatedNode(object):
         # Communication interface
         self._broker: TopologyManager = None
         self._message_queue: Queue = None
+        # RvQ: different Queue algorithms?
 
         # Node's version
         self._version: int = 0
         self._version_buffer: Queue = None
         self._node_metrics: Dict[str, Any] = {}
+        # RvQ: What are node metrics
 
         # Buildup function
         self._node_config = kwargs
         self.build(**kwargs)
+        # RvQ: what's a buildup function
 
     def build(self, **kwargs):
         """_summary_"""
@@ -64,6 +69,7 @@ class FederatedNode(object):
         self._version = 0
         self._version_buffer = Queue()
         return True
+        # RvQ: Why we need a broker?
 
     def _train(self, **train_args):
         try:
@@ -101,6 +107,7 @@ class FederatedNode(object):
         """
         if isinstance(to, str):
             to = [to]
+            # RvQ: Like TF???
 
         msg = Message(header=header, sender_id=self._id, body=body)
         ray.get([self._broker.publish.remote(msg, to)])
@@ -132,6 +139,7 @@ class FederatedNode(object):
             NotImplementedError: _description_
         """
         to_save = {k: copy.deepcopy(v) for k, v in kwargs.items()}
+        # RvQ: why deepcopy and why and what to update the version of?
         version_dict = {
             "id": self.id,
             "n_version": self.version,
