@@ -1,0 +1,4 @@
+TOPOLOGY_STAR = "star"
+TOPOLOGY_MESH = "mesh"
+TOPOLOGY_RING = "ring"
+TOPOLOGY_CUSTOM = "custom"

@@ -10,6 +10,7 @@ import numpy as np
 import ray
 from ray.util.placement_group import PlacementGroup
 
+from constants.topology_constants import TOPOLOGY_STAR
 from core.federated.federated_base import FederatedBase
 from core.federated.federated_node import FederatedNode
 from core.federated.virtual_node import VirtualNode
@@ -82,7 +83,7 @@ class StarFederatedLearningSchema(FederatedBase):
             )
 
         super(StarFederatedLearningSchema, self).__init__(
-            nodes=nodes, topology="star", config=self.config, resources=resources, is_tune=is_tune, bundle_offset=bundle_offset
+            nodes=nodes, topology=TOPOLOGY_STAR, config=self.config, resources=resources, is_tune=is_tune, bundle_offset=bundle_offset
         )
 
     def train(self, server_args: Dict, client_args: Dict, blocking: bool = False) -> None:

@@ -1,4 +1,0 @@
-STAR_TOPOLOGY = "star"
-RING_TOPOLOGY = "ring"
-MESH_TOPOLOGY = "mesh"
-CUSTOM_TOPOLOGY = "custom"

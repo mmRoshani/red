@@ -10,6 +10,7 @@ import numpy as np
 import ray
 from ray.util.placement_group import PlacementGroup
 
+from constants.topology_constants import TOPOLOGY_RING
 from core.federated.federated_base import FederatedBase
 from core.federated.federated_node import FederatedNode
 from core.federated.virtual_node import VirtualNode
@@ -27,7 +28,6 @@ class RingFederatedLearningSchema(FederatedBase):
 
     def __init__(
         self,
-        server_template: Type[FederatedNode],
         client_template: Type[FederatedNode],
         roles: List[str],
         config: 'ConfigValidator',
@@ -71,21 +71,17 @@ class RingFederatedLearningSchema(FederatedBase):
         else:
             c_ids = n_clients_or_ids
 
-        nodes = [
-            VirtualNode(
-                server_template, server_id, "train", self.config, self.log
-            )
-        ]
+        nodes = []
         for c_id, role in zip(c_ids, roles):
             nodes.append(
                 VirtualNode(client_template, c_id, role, self.config, self.log)
             )
 
         super(RingFederatedLearningSchema, self).__init__(
-            nodes=nodes, topology="star", config=self.config, resources=resources, is_tune=is_tune, bundle_offset=bundle_offset
+            nodes=nodes, topology=TOPOLOGY_RING, config=self.config, resources=resources, is_tune=is_tune, bundle_offset=bundle_offset
         )
 
-    def train(self, server_args: Dict, client_args: Dict, blocking: bool = False) -> None:
+    def train(self, client_args: Dict, blocking: bool = False) -> None:
         """
         Performs a training session in the federation. Before calling the train method
         of the nodes, the method instantiates the training nodes in the federation by
@@ -93,8 +89,6 @@ class RingFederatedLearningSchema(FederatedBase):
 
 
         Args:
-            server_args (Dict): The arguments to be passed to the train function of the
-                server node.
             client_args (Dict): The arguments to be passed to the train function of the
                 client nodes.
             blocking (bool, optional): Whether to block the current thread until the
@@ -118,12 +112,15 @@ class RingFederatedLearningSchema(FederatedBase):
         )
         ray.get([node.handle._setup_train.remote() for node in train_nodes])
 
-        server_args = [server_args]
         client_args = [
             client_args[i] if isinstance(client_args, List) else client_args
             for i, _ in enumerate(train_nodes[1:])
         ]
-        train_args = server_args + client_args
+        train_args = client_args
+
+        print("dfkl;jgiosdghdsfighdsfkghsfdkjghkdsfjghdsfkljghdfjklghkldsfjhgkjsfdghkljdshgkldjfghkldsjghlkdsjfghklsdjfgh")
+        print(train_args)
+
 
         self._runtime_remotes = [
             node.handle._train.remote(**train_args[i])

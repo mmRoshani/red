@@ -10,10 +10,10 @@ from constants.distances_constants import (
     DISTANCE_COSINE,
     DISTANCE_EUCLIDEAN,
 )
-from constants.federated_learning_schema_constants import TRADITIONAL_FEDERATED_LEARNING, CLUSTER_FEDERATED_LEARNING, \
+from constants.schema_constants import TRADITIONAL_FEDERATED_LEARNING, CLUSTER_FEDERATED_LEARNING, \
     DECENTRALIZED_FEDERATED_LEARNING
 
-from constants.federated_learning_topology_constants import  STAR_TOPOLOGY, RING_TOPOLOGY, MESH_TOPOLOGY, CUSTOM_TOPOLOGY
+from constants.topology_constants import  TOPOLOGY_STAR, TOPOLOGY_RING, TOPOLOGY_MESH, TOPOLOGY_CUSTOM
 
 from constants.models_constants import (
     MODEL_CNN,
@@ -386,7 +386,7 @@ class ConfigValidator:
         return federated_learning_schema
 
     def _schem_n_toplogy_macher(self, federated_learning_schema: str, federated_learning_topology: str):
-        if federated_learning_schema == TRADITIONAL_FEDERATED_LEARNING and federated_learning_topology != STAR_TOPOLOGY:
+        if federated_learning_schema == TRADITIONAL_FEDERATED_LEARNING and federated_learning_topology != TOPOLOGY_STAR:
             raise TypeError(f"Traditional federated learning uses the star topology only!")
         return federated_learning_topology
 

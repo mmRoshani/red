@@ -3,6 +3,7 @@ import networkx as nx
 import numpy as np
 
 from constants.framework import TOPOLOGY_MANAGER_CPU_RESOURCES
+from constants.topology_constants import *
 from .message import Message
 from typing import Dict, List, Optional, Union
 from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
@@ -44,13 +45,15 @@ class TopologyManager:
 
         self._topology = topology
         if isinstance(self._topology, str):
-            if self._topology == "star":
+            if self._topology == TOPOLOGY_STAR:
                 self._graph = nx.star_graph(self._node_ids)
-            elif self._topology == "mesh":
+            elif self._topology == TOPOLOGY_MESH:
                 self._graph = nx.complete_graph(self._node_ids)
-            elif self._topology == "ring":
+            elif self._topology == TOPOLOGY_RING:
                 self._topology = nx.cycle_graph(self._node_ids)
-            elif self._topology == "custom":
+                print(f"<============================================================ {topology}")
+                nx.draw(self._topology)
+            elif self._topology == TOPOLOGY_CUSTOM:
                 #self._graph = nx.from_numpy_array(np.array(self.adjacency_matrix))
                 '''
                 Some tips on how to make this more robust:
@@ -72,7 +75,7 @@ class TopologyManager:
             raise NotImplementedError
 
 
-def _get_or_create_broker(
+def  _get_or_create_broker(
     placement_group, federation_id: str, bundle_offset: int
 ) -> TopologyManager:
     return TopologyManager.options(
