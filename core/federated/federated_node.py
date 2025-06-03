@@ -42,7 +42,7 @@ class FederatedNode(object):
         self._role: str = role
 
         # Communication interface
-        self._broker: TopologyManager = None
+        self._tp_manager: TopologyManager = None
         self._message_queue: Queue = None
         # RvQ: different Queue algorithms?
 
@@ -63,8 +63,8 @@ class FederatedNode(object):
 
     def _setup_train(self):
         """_summary_"""
-        if self._broker is None:
-            self._broker = ray.get_actor(f"{self._fed_id}/broker")
+        if self._tp_manager is None:
+            self._tp_manager = ray.get_actor(f"{self._fed_id}/broker")
         self._message_queue = Queue()
         self._version = 0
         self._version_buffer = Queue()
@@ -110,7 +110,7 @@ class FederatedNode(object):
             # RvQ: Like TF???
 
         msg = Message(header=header, sender_id=self._id, body=body)
-        ray.get([self._broker.publish.remote(msg, to)])
+        ray.get([self._tp_manager.publish.remote(msg, to)])
 
     def receive(self, block:bool = False, timeout: Optional[float] = None) -> Message | None:
         """_summary_
@@ -221,5 +221,5 @@ class FederatedNode(object):
         Returns:
             List[str]: _description_
         """
-        return ray.get(self._broker.get_neighbors.remote(self.id))
+        return ray.get(self._tp_manager.get_neighbors.remote(self.id))
 

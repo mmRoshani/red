@@ -79,8 +79,8 @@ class RingFederatedLearning(FederatedNode):
         return random.sample(self.neighbors_id_list, num_to_sample)
 
     def run(self):
-        print(f">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> {self._broker}")
-        self.number_of_neighbors = len(self._broker.get_neighbors(self.id))
+        print(f">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> {self._tp_manager}")
+        self.number_of_neighbors = len(self._tp_manager.get_neighbors(self.id))
 
         """Main federated learning execution loop"""
         for fl_round in range(self.federated_learning_rounds):
