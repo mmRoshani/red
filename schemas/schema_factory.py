@@ -1,14 +1,27 @@
-from constants.federated_learning_schema_constants import CLUSTER_FEDERATED_LEARNING, DECENTRALIZED_FEDERATED_LEARNING, \
+from constants.schema_constants import CLUSTER_FEDERATED_LEARNING, DECENTRALIZED_FEDERATED_LEARNING, \
     TRADITIONAL_FEDERATED_LEARNING
-from schemas import traditional_federated_learning_executor
+from constants.topology_constants import *
+from schemas import star_federated_learning_executor
+from schemas.ring_federated_learning.ring_federated_learning_executor import ring_federated_learning_executor
 from utils.log import Log
 
 
-def schema_factory(schema: str, log: 'Log'):
+# Should it be renamed now that i give it topology too?
+def schema_factory(schema: str, topology: str, log: 'Log'):
     if schema == TRADITIONAL_FEDERATED_LEARNING:
-        function = traditional_federated_learning_executor
+        function = star_federated_learning_executor
         log.info(f"returning {function.__name__}")
         return function
+    if schema == DECENTRALIZED_FEDERATED_LEARNING:
+        if topology == TOPOLOGY_RING:
+            function = ring_federated_learning_executor
+            log.info(f"returning {function.__name__}")
+            return function
+        elif topology == TOPOLOGY_MESH:
+            return NotImplementedError
+        elif topology == TOPOLOGY_CUSTOM:
+            return NotImplementedError
+        return None
     elif schema == CLUSTER_FEDERATED_LEARNING:
         raise NotImplementedError()
     elif schema == DECENTRALIZED_FEDERATED_LEARNING:

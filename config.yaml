@@ -3,8 +3,11 @@ gpu_index: "0"
 
 federation_id: '1.x.y'
 # RvQ: What is the meaning of CLusteredFederatedLearning?
-# TraditionalFederatedLearning | ClusterFederatedLearningSchema
-federated_learning_schema: 'TraditionalFederatedLearning'
+# TraditionalFederatedLearning | DecentralizedFederatedLearning | ClusterFederatedLearningSchema
+federated_learning_schema: 'DecentralizedFederatedLearning'
+# The network topology of the federated learning: star, mesh, ring, custom (given an adjacency matrix)
+federated_learning_topology: 'ring'
+
 # train | test | eval | train-test-eval | train-eval | etc.
 client_role: 'train' # RvQ: We got clients that only train or only evaluate?
 
@@ -13,7 +16,7 @@ model_type: "cnn"
 pretrained_models: false
 dataset_type: "fmnist"
 
-data_distribution_kind: "20"
+data_distribution_kind: "30"
 desired_distribution: null
 dirichlet_beta: 0.5
 

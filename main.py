@@ -63,7 +63,7 @@ def main(config_yaml_path: str = "./config.yaml"):
     )
 
     log.info("----------    Schema  Factory --------------------------------------------------")
-    schema_runner_fn = schema_factory(config.FEDERATED_LEARNING_SCHEMA ,log)
+    schema_runner_fn = schema_factory(config.FEDERATED_LEARNING_SCHEMA, config.FEDERATED_LEARNING_TOPOLOGY ,log)
     schema_runner_fn(config, log)
 
 if __name__ == "__main__":

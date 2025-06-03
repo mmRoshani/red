@@ -3,6 +3,7 @@ import networkx as nx
 import numpy as np
 
 from constants.framework import TOPOLOGY_MANAGER_CPU_RESOURCES
+from constants.topology_constants import *
 from .message import Message
 from typing import Dict, List, Optional, Union
 from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
@@ -44,13 +45,37 @@ class TopologyManager:
 
         self._topology = topology
         if isinstance(self._topology, str):
-            if self._topology == "star":
+            if self._topology == TOPOLOGY_STAR:
                 self._graph = nx.star_graph(self._node_ids)
+            elif self._topology == TOPOLOGY_MESH:
+                self._graph = nx.complete_graph(self._node_ids)
+            elif self._topology == TOPOLOGY_RING:
+                self._topology = nx.cycle_graph(self._node_ids)
+                print(f"<============================================================ {topology}")
+                nx.draw(self._topology)
+            elif self._topology == TOPOLOGY_CUSTOM:
+                #self._graph = nx.from_numpy_array(np.array(self.adjacency_matrix))
+                '''
+                Some tips on how to make this more robust:
+                Check for the attribute of adjacency matrix like this maybe:
+                if hasattr(self, "adjacency_matrix"):
+                    self._graph = nx.from_numpy_array(np.array(self.adjacency_matrix))
+                else:
+                    raise ValueError("Custom topology requires 'adjacency_matrix' attribute.")
+                but here?
+                
+                Make sure adjacency_matrix is square and matches the number of nodes.
+
+                If your nodes have IDs other than 0, 1, ..., n-1, you’ll need to relabel the graph after creation
+                
+                       This goes here? |
+                                       V
+                '''
         elif isinstance(self._topology, np.ndarray):
             raise NotImplementedError
 
 
-def _get_or_create_broker(
+def  _get_or_create_broker(
     placement_group, federation_id: str, bundle_offset: int
 ) -> TopologyManager:
     return TopologyManager.options(
