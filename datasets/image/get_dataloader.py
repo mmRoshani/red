@@ -16,7 +16,7 @@ from utils.check_train_test_class_mismatch import check_train_test_class_mismatc
 
 def get_dataloader(dataset, datadir, train_bs, test_bs, dataidxs=None, noise_level=0, net_id=None, total=0):
     if dataset in (
-            DATA_SET_MNIST, 'femnist', DATA_SET_FMNIST, DATA_SET_CIFAR_100, DATA_SET_SVHN, 'generated', 'covtype', 'a9a',
+            DATA_SET_MNIST, 'femnist', DATA_SET_FMNIST, DATA_SET_CIFAR_10, DATA_SET_SVHN, 'generated', 'covtype', 'a9a',
             'rcv1', 'SUSY', DATA_SET_CIFAR_100, DATA_SET_TINY_IMAGE_NET):
         if dataset == DATA_SET_MNIST:
             dl_obj = MNIST_truncated
