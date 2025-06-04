@@ -59,7 +59,7 @@ class RingFederatedLearning(FederatedNode):
         self.test_loader = self.config.RUNTIME_COMFIG.test_loaders[get_last_char_as_int(self.id)]
 
     def local_training_round(self, round_num: int):
-        """Perform one round of local training (Step 2-3 in Algorithm 1)"""
+        """ Perform one round of local training """
         self.log.info(f'Client {self.id} starting local training round {round_num}')
         
         # Local training for specified epochs
@@ -87,23 +87,24 @@ class RingFederatedLearning(FederatedNode):
 
         self.log.info(f'Client {self.id} completed local training round {round_num}')
 
-    def send_model_through_ring(self):
-        """Send model parameters through the ring topology (Step 6 in Algorithm 1)"""
+    def send_model_through_ring_clock_wise(self):
+        """ Send model parameters through the ring topology """
         message_body = {
             MESSAGE_BODY_STATES: self.model.to('cpu').state_dict(),
             'sender_id': self.id,
             'round': self.global_round_counter
         }
         
-        self.log.info(f"Client {self.id} sending model parameters through ring to neighbors: {self.neighbors}")
-        self.send(header=MODEL_UPDATE, body=message_body, to=self.neighbors)
+        self.log.info(f"Client {self.id} sending model parameters through ring to neighbor 
+                      the right: {self.neighbors[1]}")
+        self.send(header=MODEL_UPDATE, body=message_body, to=self.neighbors[1])
 
     def receive_and_aggregate_models(self):
-        """Receive models from ring and perform weighted aggregation (Steps 7-8 in Algorithm 1)"""
+        """ Receive models from ring and perform weighted aggregation """
         self.log.info(f'Client {self.id} starting model aggregation phase')
         
         # Setup aggregator for trusted nodes (all neighbors for now - malicious detection can be added later)
-        trusted_nodes = self.neighbors.copy()
+        trusted_nodes = self.neighbors[0].copy()
         self.aggregator.setup(trusted_nodes)
         
         received_models = {}
@@ -142,24 +143,24 @@ class RingFederatedLearning(FederatedNode):
         self.log.info(f'Client {self.id} updated local model with aggregated parameters')
 
     def run(self):
-        """Main RDFL execution following Algorithm 1"""
+        """ Main RDFL execution """
         self.log.info(f"Client {self.id} initializing ring topology")
         self.log.info(f"Topology manager: {self._tp_manager}")
         self.neighbors_id_list = self.neighbors
         self.log.info(f"Client {self.id} neighbors: {self.neighbors_id_list}")
         self.log.info(f"Synchronizing interval K = {self.synchronizing_interval}")
 
-        # Main federated learning loop (Step 1 in Algorithm 1)
+        # Main federated learning loop
         for t in range(1, self.federated_learning_rounds + 1):
             self.global_round_counter = t
             self.log.info(f'=' * 80)
             self.log.info(f'Client {self.id} - GLOBAL ROUND {t}/{self.federated_learning_rounds}')
             self.log.info(f'=' * 80)
             
-            # Step 2-3: Local training round
+            # Local training round
             self.local_training_round(t)
             
-            # Step 4: Check if synchronization is needed (t mod K = 0)
+            # Check if synchronization is needed (t mod K = 0)
             if t % self.synchronizing_interval == 0:
                 self.log.info(f'Client {self.id} - SYNCHRONIZATION triggered at round {t} (t mod K = {t % self.synchronizing_interval})')
                 
