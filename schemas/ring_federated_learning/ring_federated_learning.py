@@ -95,8 +95,8 @@ class RingFederatedLearning(FederatedNode):
             'round': self.global_round_counter
         }
         
-        self.log.info(f"Client {self.id} sending model parameters through ring to neighbor 
-                      the right: {self.neighbors[1]}")
+        self.log.info(f"Client {self.id} sending model parameters through ring to neighbor" 
+                      f"the right: {self.neighbors[1]}")
         self.send(header=MODEL_UPDATE, body=message_body, to=self.neighbors[1])
 
     def receive_and_aggregate_models(self):
