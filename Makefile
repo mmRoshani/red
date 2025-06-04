@@ -5,4 +5,4 @@ shakespeare:
 	./scripts/get_shakespeare_data.sh
 
 run:
-	python ./main.pyA
+	python ./main.py
