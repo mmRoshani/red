@@ -51,6 +51,7 @@ class TopologyManager:
                 self._graph = nx.complete_graph(self._node_ids)
             elif self._topology == TOPOLOGY_RING:
                 self._topology = nx.cycle_graph(self._node_ids)
+                self._graph = nx.cycle_graph(self._node_ids)
                 print(f"<============================================================ {topology}")
                 nx.draw(self._topology)
             elif self._topology == TOPOLOGY_CUSTOM:

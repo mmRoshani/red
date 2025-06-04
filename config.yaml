@@ -32,7 +32,7 @@ aggregation_strategy: "FedAvg"
 aggregation_sample_scaling: false
 
 distance_metric_on_parameters: true
-number_of_epochs: 3
+number_of_epochs: 1
 train_batch_size: 28
 test_batch_size: 28
 transform_input_size: 28
