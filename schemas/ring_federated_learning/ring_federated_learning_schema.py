@@ -112,16 +112,13 @@ class RingFederatedLearningSchema(FederatedBase):
         )
         ray.get([node.handle._setup_train.remote() for node in train_nodes])
 
-        client_args = [
+        train_args = [
             client_args[i] if isinstance(client_args, List) else client_args
-            for i, _ in enumerate(train_nodes[1:])
+            for i, _ in enumerate(train_nodes)
         ]
-        train_args = client_args
 
         print("dfkl;jgiosdghdsfighdsfkghsfdkjghkdsfjghdsfkljghdfjklghkldsfjhgkjsfdghkljdshgkldjfghkldsjghlkdsjfghklsdjfgh")
-        print(train_args)
-
-
+        print(f">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> {train_args}")
         self._runtime_remotes = [
             node.handle._train.remote(**train_args[i])
             for i, node in enumerate(train_nodes)

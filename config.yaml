@@ -4,9 +4,9 @@ gpu_index: "0"
 federation_id: '1.x.y'
 # RvQ: What is the meaning of CLusteredFederatedLearning?
 # TraditionalFederatedLearning | DecentralizedFederatedLearning | ClusterFederatedLearningSchema
-federated_learning_schema: 'TraditionalFederatedLearning'
+federated_learning_schema: 'DecentralizedFederatedLearning'
 # The network topology of the federated learning: star, mesh, ring, custom (given an adjacency matrix)
-federated_learning_topology: 'star'
+federated_learning_topology: 'ring'
 
 # train | test | eval | train-test-eval | train-eval | etc.
 client_role: 'train' # RvQ: We got clients that only train or only evaluate?
@@ -32,7 +32,7 @@ aggregation_strategy: "FedAvg"
 aggregation_sample_scaling: false
 
 distance_metric_on_parameters: true
-number_of_epochs: 3
+number_of_epochs: 1
 train_batch_size: 28
 test_batch_size: 28
 transform_input_size: 28
