@@ -5,6 +5,7 @@ import numpy as np
 from constants.framework import TOPOLOGY_MANAGER_CPU_RESOURCES
 from constants.topology_constants import *
 from .message import Message
+from matplotlib import pyplot as plt
 from typing import Dict, List, Optional, Union
 from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
 
@@ -52,6 +53,8 @@ class TopologyManager:
             elif self._topology == TOPOLOGY_RING:
                 self._topology = nx.cycle_graph(self._node_ids)
                 self._graph = nx.cycle_graph(self._node_ids)
+                nx.draw(self._graph, with_labels=True)
+                plt.show()
                 print(f"<============================================================ {topology}")
                 nx.draw(self._topology)
             elif self._topology == TOPOLOGY_CUSTOM:
