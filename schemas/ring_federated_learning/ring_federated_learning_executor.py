@@ -32,7 +32,7 @@ def ring_federated_learning_executor(config: ConfigValidator, log: Log):
 
     federation.train(
         client_args={"optimizer_fn": torch.optim.SGD, "loss_fn": torch.nn.CrossEntropyLoss,},
-        blocking=False,
+        blocking=True,
     )
 
     for _ in range(config.NUMBER_OF_CLIENTS):
