@@ -362,7 +362,7 @@ def secure_publish(self, encrypted_msg: EncryptedMessage, ids: List[str]):
 
 - **[Federated Base]({% post_url 2024-01-01-federated-base %})**: Federation orchestration
 - **[Virtual Nodes]({% post_url 2024-01-02-virtual-nodes %})**: Node management
-- **[Message System]({% post_url 2024-01-09-message-system %})**: Message structure and handling
+- **[API Reference]({% post_url 2024-01-08-api-reference %})**: Message structure and handling details
 
 ---
 
