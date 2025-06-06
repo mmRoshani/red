@@ -3,13 +3,13 @@ description: A Production-Grade Federated Learning Framework with Ray
 author: 
   name: Red Project Team
   email: mohammadmojtabaroshani@outlook.com
-url: "https://mmroshani.github.io"
+url: "https://mmroshani.ir"
 baseurl: "/red"
 
 # Build settings
 markdown: kramdown
 highlighter: rouge
-theme: just-the-docs
+theme: minima
 
 # Kramdown configuration
 kramdown:
@@ -23,27 +23,15 @@ kramdown:
   enable_coderay: false
   syntax_highlighter: rouge
 
-# Theme settings
-just_the_docs:
-  # Color scheme supports "light" (default) and "dark"
-  color_scheme: light
-  
-  # Enable or disable the search
-  search_enabled: true
-  
-  # Heading anchor links appear on hover over h1-h6 tags
-  heading_anchors: true
-  
-  # Enable or disable the back-to-top button
-  back_to_top: true
-  
-  # Enable or disable the back-to-top button text
-  back_to_top_text: "Back to top"
-  
-  # Footer content
-  footer_content: "Copyright &copy; 2024 Red Project Team. Distributed by <a href=\"https://github.com/mmroshani/red\">GitHub</a>"
+# Minima theme settings
+minima:
+  skin: classic
+  social_links:
+    github: mmroshani
+    twitter: 
+    linkedin: 
 
-# Plugins
+# Plugins (supported by GitHub Pages)
 plugins:
   - jekyll-feed
   - jekyll-sitemap
@@ -51,37 +39,25 @@ plugins:
   - jekyll-github-metadata
   - jekyll-avatar
   - jemoji
-  - jekyll-paginate
-  - jekyll-gist
-  - jekyll-coffeescript
-  - jekyll-commonmark-ghpages
+  - jekyll-mentions
   - jekyll-relative-links
   - jekyll-optional-front-matter
   - jekyll-readme-index
   - jekyll-default-layout
   - jekyll-titles-from-headings
 
-# Pagination
-paginate: 5
-paginate_path: "/blog/page:num/"
-
-# Collections
+# Collections for better organization
 collections:
-  posts:
+  docs:
     output: true
-    permalink: /blog/:year/:month/:day/:title/
+    permalink: /:collection/:name/
 
-# Navigation
-nav_external_links:
-  - title: GitHub Repository
-    url: https://github.com/mmroshani/red
-    hide_icon: false
-
-# SEO settings
-twitter:
-  username: 
-facebook:
-  username: 
+# Navigation structure
+header_pages:
+  - index.md
+  - getting-started.md
+  - architecture.md
+  - api-docs.md
 
 # GitHub settings
 github_username: mmroshani
@@ -97,11 +73,6 @@ exclude:
   - vendor/gems/
   - vendor/ruby/
   - README.md
-  - CNAME
 
-# Mermaid configuration
-mermaid:
-  # Version of mermaid library to use
-  version: "10.6.1"
-  # Theme can be default, neutral, dark, forest, etc.
-  theme: default 
+# Enable Mermaid for diagrams
+mermaid: true 
