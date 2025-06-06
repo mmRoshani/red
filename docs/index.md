@@ -1,10 +1,6 @@
 ---
 layout: home
 title: Red Federated Learning Framework
-subtitle: A Production-Grade Federated Learning Framework with Ray
-author: Red Project Team
-show_edit_on_github: true
-show_subscribe: false
 ---
 
 # Red: Production-Grade Federated Learning with Ray
