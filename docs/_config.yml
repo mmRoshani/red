@@ -2,8 +2,8 @@ title: Red Federated Learning Framework
 description: A Production-Grade Federated Learning Framework with Ray
 author: Red Project Team
 email: contact@red-project.dev
-url: ""
-baseurl: ""
+url: "https://mmroshani.ir"
+baseurl: "/red"
 
 # Build settings
 markdown: kramdown
