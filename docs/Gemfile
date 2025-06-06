@@ -9,11 +9,15 @@ source "https://rubygems.org"
 # This will help ensure the proper Jekyll version is running.
 # Happy Jekylling!
 
-# Use GitHub Pages gem for compatibility
-gem "github-pages", "~> 232", group: :jekyll_plugins
+# Use Jekyll directly instead of github-pages for custom themes
+gem "jekyll", "~> 4.3.0"
 
 # Documentation theme
 gem "just-the-docs", "~> 0.7.0"
+
+# Additional gems for Jekyll functionality
+gem "webrick", "~> 1.7"
+gem "kramdown-parser-gfm"
 
 # If you have any plugins, put them here!
 group :jekyll_plugins do

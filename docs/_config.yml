@@ -11,13 +11,22 @@ markdown: kramdown
 highlighter: rouge
 theme: just-the-docs
 
+# Kramdown configuration
+kramdown:
+  input: GFM
+  hard_wrap: false
+  auto_ids: true
+  footnote_nr: 1
+  entity_output: as_char
+  toc_levels: 1..6
+  smart_quotes: lsquo,rsquo,ldquo,rdquo
+  enable_coderay: false
+  syntax_highlighter: rouge
+
 # Theme settings
 just_the_docs:
   # Color scheme supports "light" (default) and "dark"
   color_scheme: light
-  
-  # Enable or disable the site title
-  title: true
   
   # Enable or disable the search
   search_enabled: true
@@ -31,47 +40,8 @@ just_the_docs:
   # Enable or disable the back-to-top button text
   back_to_top_text: "Back to top"
   
-  # Enable or disable the footer
+  # Footer content
   footer_content: "Copyright &copy; 2024 Red Project Team. Distributed by <a href=\"https://github.com/mmroshani/red\">GitHub</a>"
-  
-  # Enable or disable the last modified date
-  last_modified: true
-  
-  # Enable or disable the search heading
-  search_heading: true
-  
-  # Enable or disable the search preview
-  search_preview: true
-  
-  # Enable or disable the search preview words before
-  search_preview_words_before: 5
-  
-  # Enable or disable the search preview words after
-  search_preview_words_after: 10
-  
-  # Enable or disable the search tokenizer
-  search_tokenizer_separator: /[\s/]+/
-  
-  # Enable or disable the search rel_url
-  search_rel_url: true
-  
-  # Enable or disable the search heading
-  search_heading: true
-  
-  # Enable or disable the search preview
-  search_preview: true
-  
-  # Enable or disable the search preview words before
-  search_preview_words_before: 5
-  
-  # Enable or disable the search preview words after
-  search_preview_words_after: 10
-  
-  # Enable or disable the search tokenizer
-  search_tokenizer_separator: /[\s/]+/
-  
-  # Enable or disable the search rel_url
-  search_rel_url: true
 
 # Plugins
 plugins:
@@ -127,22 +97,11 @@ exclude:
   - vendor/gems/
   - vendor/ruby/
   - README.md
-  - CNAME 
+  - CNAME
 
 # Mermaid configuration
 mermaid:
   # Version of mermaid library to use
   version: "10.6.1"
   # Theme can be default, neutral, dark, forest, etc.
-  theme: default
-
-# Enable kramdown extensions
-kramdown:
-  input: GFM
-  hard_wrap: false
-  auto_ids: true
-  footnote_nr: 1
-  entity_output: as_char
-  toc_levels: 1..6
-  smart_quotes: lsquo,rsquo,ldquo,rdquo
-  enable_coderay: false 
+  theme: default 
