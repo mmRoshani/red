@@ -1,5 +1,5 @@
 ---
-layout: home
+layout: default
 title: Red Federated Learning Framework
 nav_order: 1
 ---
@@ -29,22 +29,22 @@ nav_order: 1
 ### Federated Base
 The foundation class for all federated learning implementations, providing core functionality and lifecycle management.
 
-[Learn more about Federated Base]({% post_url 2024-01-01-federated-base %}){: .btn .btn-primary }
+[Learn more about Federated Base]({{ site.baseurl }}/blog/2024/01/01/federated-base/){: .btn .btn-primary }
 
 ### Virtual Nodes
 Lazy-initialized node wrappers that optimize resource management and enable efficient scaling.
 
-[Explore Virtual Nodes]({% post_url 2024-01-02-virtual-nodes %}){: .btn .btn-primary }
+[Explore Virtual Nodes]({{ site.baseurl }}/blog/2024/01/02/virtual-nodes/){: .btn .btn-primary }
 
 ### Topology Manager
 Handles network communication and node relationships, supporting various network topologies.
 
-[Discover Topology Manager]({% post_url 2024-01-03-topology-manager %}){: .btn .btn-primary }
+[Discover Topology Manager]({{ site.baseurl }}/blog/2024/01/03/topology-manager/){: .btn .btn-primary }
 
 ### Federated Node
 Individual participant nodes in the federation, managing local model training and updates.
 
-[Understand Federated Nodes]({% post_url 2024-01-04-federated-node %}){: .btn .btn-primary }
+[Understand Federated Nodes]({{ site.baseurl }}/blog/2024/01/04/federated-node/){: .btn .btn-primary }
 
 ## Ray Integration
 
@@ -56,7 +56,7 @@ Red leverages Ray's powerful distributed computing capabilities:
 - **Fault Tolerance**: Built-in resilience through Ray's supervision
 - **Scalability**: Dynamic scaling across multiple machines
 
-[Deep dive into Ray Integration]({% post_url 2024-01-06-ray-integration-deep-dive %}){: .btn .btn-primary }
+[Deep dive into Ray Integration]({{ site.baseurl }}/blog/2024/01/06/ray-integration-deep-dive/){: .btn .btn-primary }
 
 ## Use Cases
 
@@ -76,9 +76,9 @@ Red leverages Ray's powerful distributed computing capabilities:
 
 Ready to build production-grade federated learning systems? Start with our comprehensive guides:
 
-- [Quick Start Guide]({% post_url 2024-01-05-getting-started %}){: .btn .btn-primary }
-- [Architecture Overview]({% post_url 2024-01-07-architecture-overview %}){: .btn .btn-primary }
-- [API Reference]({% post_url 2024-01-08-api-reference %}){: .btn .btn-primary }
+- [Quick Start Guide]({{ site.baseurl }}/blog/2024/01/05/getting-started/){: .btn .btn-primary }
+- [Architecture Overview]({{ site.baseurl }}/blog/2024/01/07/architecture-overview/){: .btn .btn-primary }
+- [API Reference]({{ site.baseurl }}/blog/2024/01/08/api-reference/){: .btn .btn-primary }
 
 <style>
 .grid-container {
