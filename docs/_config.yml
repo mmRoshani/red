@@ -1,19 +1,47 @@
 title: Red Federated Learning Framework
 description: A Production-Grade Federated Learning Framework with Ray
-author: Red Project Team
-email: contact@red-project.dev
+author: 
+  name: Red Project Team
+  email: mohammadmojtabaroshani@outlook.com
+  links:
+    - https://github.com/mmroshani/red
 url: "https://mmroshani.ir"
 baseurl: "/red"
+
+# YAT Theme Configuration
+yat:
+  date_format: "%b %d, %Y"
+  disqus:
+    shortname: ""
+  google_analytics: ""
+
+# Site banner
+banner:
+  video: null             # Video banner source
+  loop: false             # Video loop
+  volume: 0               # Video volume (100% is 1.0)
+  start_at: 0             # Video start time
+  image: null             # No image banner for now
+  opacity: 0.8            # Banner opacity (100% is 1.0)
+  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+  height: "50vh"          # Banner height
+  min_height: "38vh"      # Banner minimum height
+  heading_style: "font-size: 3.5em; font-weight: bold; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)"
+  subheading_style: "color: rgba(255, 255, 255, 0.9); font-size: 1.2em"
 
 # Build settings
 markdown: kramdown
 highlighter: rouge
-theme: minima
+remote_theme: "jeffreytse/jekyll-theme-yat"
 
 # Plugins
 plugins:
   - jekyll-feed
   - jekyll-sitemap
+  - jekyll-seo-tag
+  - jekyll-github-metadata
+  - jekyll-avatar
+  - jemoji
 
 # Collections
 collections:
@@ -21,18 +49,12 @@ collections:
     output: true
     permalink: /:categories/:year/:month/:day/:title/
 
-# Navigation
-nav_links:
-  - title: Home
-    url: /
-  - title: Getting Started
-    url: /getting-started/
-  - title: Architecture
-    url: /architecture/
-  - title: Ray Integration
-    url: /ray-integration/
-  - title: API Reference
-    url: /api-reference/
+# Navigation  
+header_pages:
+  - getting-started.md
+  - architecture-diagrams.md
+  - ray-integration.md
+  - api-reference.md
 
 # Exclude from processing
 exclude:
