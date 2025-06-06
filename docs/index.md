@@ -1,69 +1,117 @@
 ---
 layout: home
 title: Red Federated Learning Framework
+nav_order: 1
 ---
 
-# Red: Production-Grade Federated Learning with Ray
+# Red: Production-Grade Federated Learning Framework
 
-Welcome to the Red Federated Learning Framework documentation. Red is a cutting-edge, production-ready federated learning system built on top of Ray for scalable distributed machine learning.
+<div class="grid-container">
+  <div class="grid-item">
+    <h2>🚀 Overview</h2>
+    <p>Red is a cutting-edge, production-ready federated learning system built on top of Ray for scalable distributed machine learning. It enables organizations to collaborate on machine learning models while keeping their data private and secure.</p>
+  </div>
+  
+  <div class="grid-item">
+    <h2>💡 Key Features</h2>
+    <ul>
+      <li><strong>Ray-Powered Distribution</strong>: Efficient federated learning through Ray's distributed computing</li>
+      <li><strong>Flexible Topologies</strong>: Star, ring, mesh, and custom network configurations</li>
+      <li><strong>Virtual Node Architecture</strong>: Advanced resource management with lazy initialization</li>
+      <li><strong>Production Ready</strong>: Enterprise-grade reliability and scalability</li>
+      <li><strong>Multiple FL Schemas</strong>: Support for various federated learning approaches</li>
+    </ul>
+  </div>
+</div>
 
-## 🚀 Key Features
+## Core Components
 
-- **Ray-Powered Distribution**: Leverages Ray's distributed computing capabilities for efficient federated learning
-- **Flexible Topologies**: Support for star, ring, mesh, and custom network topologies
-- **Virtual Node Architecture**: Advanced node management with lazy initialization and resource optimization
-- **Production Ready**: Built with enterprise-grade reliability and scalability in mind
-- **Multiple FL Schemas**: Support for traditional, decentralized, and clustered federated learning approaches
+### Federated Base
+The foundation class for all federated learning implementations, providing core functionality and lifecycle management.
 
-## 🏗️ Core Architecture
+[Learn more about Federated Base]({% post_url 2024-01-01-federated-base %}){: .btn .btn-primary }
 
-Red is built around several key components:
+### Virtual Nodes
+Lazy-initialized node wrappers that optimize resource management and enable efficient scaling.
 
-### 🔧 Core Components
+[Explore Virtual Nodes]({% post_url 2024-01-02-virtual-nodes %}){: .btn .btn-primary }
 
-- **[Federated Base]({% post_url 2024-01-01-federated-base %})**: The foundation class for all federated learning implementations
-- **[Virtual Nodes]({% post_url 2024-01-02-virtual-nodes %})**: Lazy-initialized node wrappers for efficient resource management
-- **[Topology Manager]({% post_url 2024-01-03-topology-manager %})**: Handles network communication and node relationships
-- **[Federated Node]({% post_url 2024-01-04-federated-node %})**: Individual participant nodes in the federation
+### Topology Manager
+Handles network communication and node relationships, supporting various network topologies.
 
-### 🌐 Network Topologies
+[Discover Topology Manager]({% post_url 2024-01-03-topology-manager %}){: .btn .btn-primary }
 
-- **Star Topology**: Centralized communication through a server node
-- **Ring Topology**: Peer-to-peer communication in a circular pattern
-- **Mesh Topology**: Full connectivity between all nodes
-- **Custom Topology**: User-defined adjacency matrices for specialized architectures
+### Federated Node
+Individual participant nodes in the federation, managing local model training and updates.
 
-## 📊 Ray Integration Highlights
+[Understand Federated Nodes]({% post_url 2024-01-04-federated-node %}){: .btn .btn-primary }
 
-Red extensively uses Ray for:
+## Ray Integration
+
+Red leverages Ray's powerful distributed computing capabilities:
 
 - **Remote Execution**: All nodes run as Ray remote actors
-- **Resource Management**: Placement groups for optimal resource allocation
+- **Resource Management**: Optimal resource allocation through placement groups
 - **Message Passing**: Efficient inter-node communication
 - **Fault Tolerance**: Built-in resilience through Ray's supervision
 - **Scalability**: Dynamic scaling across multiple machines
 
-## 🎯 Use Cases
+[Deep dive into Ray Integration]({% post_url 2024-01-06-ray-integration-deep-dive %}){: .btn .btn-primary }
+
+## Use Cases
 
 - **Distributed Machine Learning**: Train models across multiple data sources
 - **Privacy-Preserving AI**: Keep data localized while sharing model updates
 - **Edge Computing**: Deploy federated learning on IoT and edge devices
 - **Multi-Organization Collaboration**: Enable secure ML collaboration
 
-## 📈 Performance Benefits
+## Performance Benefits
 
 - **Horizontal Scaling**: Scale to hundreds of participants
 - **Resource Efficiency**: Optimal CPU/GPU utilization through Ray
 - **Network Optimization**: Minimized communication overhead
 - **Fault Recovery**: Automatic handling of node failures
 
-## 🔗 Quick Links
+## Getting Started
 
-- [Getting Started Guide]({% post_url 2024-01-05-getting-started %})
-- [Ray Integration Deep Dive]({% post_url 2024-01-06-ray-integration-deep-dive %})
-- [Architecture Overview]({% post_url 2024-01-07-architecture-overview %})
-- [API Reference]({% post_url 2024-01-08-api-reference %})
+Ready to build production-grade federated learning systems? Start with our comprehensive guides:
 
----
+- [Quick Start Guide]({% post_url 2024-01-05-getting-started %}){: .btn .btn-primary }
+- [Architecture Overview]({% post_url 2024-01-07-architecture-overview %}){: .btn .btn-primary }
+- [API Reference]({% post_url 2024-01-08-api-reference %}){: .btn .btn-primary }
 
-*Ready to build production-grade federated learning systems? Start with our [Getting Started Guide]({% post_url 2024-01-05-getting-started %})!* 
+<style>
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.grid-item {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  margin: 0.5rem 0;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #0366d6;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #024ea4;
+  color: white;
+  text-decoration: none;
+}
+</style> 

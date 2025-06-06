@@ -12,8 +12,8 @@ source "https://rubygems.org"
 # Use GitHub Pages gem for compatibility
 gem "github-pages", "~> 232", group: :jekyll_plugins
 
-# Default theme
-gem "minima", "~> 2.5"
+# Documentation theme
+gem "just-the-docs", "~> 0.7.0"
 
 # If you have any plugins, put them here!
 group :jekyll_plugins do

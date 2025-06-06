@@ -51,12 +51,17 @@ class TopologyManager:
             elif self._topology == TOPOLOGY_MESH:
                 self._graph = nx.complete_graph(self._node_ids)
             elif self._topology == TOPOLOGY_RING:
-                self._topology = nx.cycle_graph(self._node_ids)
                 self._graph = nx.cycle_graph(self._node_ids)
-                nx.draw(self._graph, with_labels=True)
-                plt.show()
-                print(f"<============================================================ {topology}")
-                nx.draw(self._topology)
+                # Generate and save topology diagram
+                try:
+                    from utils.diagram_generator import save_topology_diagram
+                    save_topology_diagram(self._graph, "output", "svg", "circular")
+                except ImportError:
+                    # Fallback to matplotlib if custom generator not available
+                    nx.draw(self._graph, with_labels=True, pos=nx.circular_layout(self._graph))
+                    plt.title("Ring Topology")
+                    plt.savefig("output.svg", format='svg', bbox_inches='tight')
+                    plt.close()
             elif self._topology == TOPOLOGY_CUSTOM:
                 #self._graph = nx.from_numpy_array(np.array(self.adjacency_matrix))
                 '''
