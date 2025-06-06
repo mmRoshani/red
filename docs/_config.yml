@@ -1,0 +1,45 @@
+title: Red Federated Learning Framework
+description: A Production-Grade Federated Learning Framework with Ray
+author: Red Project Team
+email: contact@red-project.dev
+url: ""
+baseurl: ""
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: minima
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+
+# Collections
+collections:
+  posts:
+    output: true
+    permalink: /:categories/:year/:month/:day/:title/
+
+# Navigation
+nav_links:
+  - title: Home
+    url: /
+  - title: Getting Started
+    url: /getting-started/
+  - title: Architecture
+    url: /architecture/
+  - title: Ray Integration
+    url: /ray-integration/
+  - title: API Reference
+    url: /api-reference/
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/ 
