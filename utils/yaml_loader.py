@@ -49,6 +49,7 @@ def load_objectified_yaml(yaml_path: str):
         'pretrained_models': getattr(yaml_obj, 'pretrained_models', False),
         'federated_learning_schema': getattr(yaml_obj, 'federated_learning_schema', None),
         'federated_learning_topology': getattr(yaml_obj, 'federated_learning_topology', None),
+        'client_k_neighbors': getattr(yaml_obj, 'client_k_neighbors', None),
         'client_role': getattr(yaml_obj, 'client_role', None),
         'client_sampling_rate': getattr(yaml_obj, 'client_sampling_rate', None),
         'aggregation_strategy': getattr(yaml_obj, 'aggregation_strategy', None),
