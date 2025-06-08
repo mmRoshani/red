@@ -1,0 +1,78 @@
+title: Red Federated Learning Framework
+description: A Production-Grade Federated Learning Framework with Ray
+author: 
+  name: Red Project Team
+  email: mohammadmojtabaroshani@outlook.com
+url: "https://mmroshani.ir"
+baseurl: "/red"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: minima
+
+# Kramdown configuration
+kramdown:
+  input: GFM
+  hard_wrap: false
+  auto_ids: true
+  footnote_nr: 1
+  entity_output: as_char
+  toc_levels: 1..6
+  smart_quotes: lsquo,rsquo,ldquo,rdquo
+  enable_coderay: false
+  syntax_highlighter: rouge
+
+# Minima theme settings
+minima:
+  skin: classic
+  social_links:
+    github: mmroshani
+    twitter: 
+    linkedin: 
+
+# Plugins (supported by GitHub Pages)
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+  - jekyll-github-metadata
+  - jekyll-avatar
+  - jemoji
+  - jekyll-mentions
+  - jekyll-relative-links
+  - jekyll-optional-front-matter
+  - jekyll-readme-index
+  - jekyll-default-layout
+  - jekyll-titles-from-headings
+
+# Collections for better organization
+collections:
+  docs:
+    output: true
+    permalink: /:collection/:name/
+
+# Navigation structure
+header_pages:
+  - index.md
+  - getting-started.md
+  - architecture.md
+  - api-docs.md
+
+# GitHub settings
+github_username: mmroshani
+repository: mmroshani/red
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - README.md
+
+# Enable Mermaid for diagrams
+mermaid: true 

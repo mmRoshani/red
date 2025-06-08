@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: "en" }}">
+
+  {%- include head.html -%}
+
+  <body>
+
+    {%- include header.html -%}
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        {{ content }}
+      </div>
+    </main>
+
+    {%- include footer.html -%}
+
+    <!-- Load Mermaid initialization script -->
+    <script src="{{ '/assets/js/mermaid-init.js' | relative_url }}"></script>
+
+    <style>
+      /* Custom styling for the Red framework */
+      .site-header {
+        border-bottom: 2px solid #0366d6;
+      }
+      
+      .site-title {
+        color: #0366d6 !important;
+        font-weight: bold;
+      }
+      
+      .post-link {
+        color: #0366d6;
+      }
+      
+      .post-link:hover {
+        color: #024ea4;
+      }
+    </style>
+
+  </body>
+
+</html>
