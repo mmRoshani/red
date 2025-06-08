@@ -3,6 +3,7 @@ from constants.schema_constants import CLUSTER_FEDERATED_LEARNING, DECENTRALIZED
 from constants.topology_constants import *
 from schemas import star_federated_learning_executor
 from schemas.ring_federated_learning.ring_federated_learning_executor import ring_federated_learning_executor
+from schemas.k_connect_federated_learning.k_connect_federated_learning_executor import k_connect_federated_learning_executor
 from utils.log import Log
 
 
@@ -17,8 +18,10 @@ def schema_factory(schema: str, topology: str, log: 'Log'):
             function = ring_federated_learning_executor
             log.info(f"returning {function.__name__}")
             return function
-        elif topology == TOPOLOGY_MESH:
-            return NotImplementedError
+        elif topology == TOPOLOGY_K_CONNECT:
+            function = k_connect_federated_learning_executor
+            log.info(f"returning {function.__name__}")
+            return function
         elif topology == TOPOLOGY_CUSTOM:
             return NotImplementedError
         return None

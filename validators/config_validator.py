@@ -13,7 +13,7 @@ from constants.distances_constants import (
 from constants.schema_constants import TRADITIONAL_FEDERATED_LEARNING, CLUSTER_FEDERATED_LEARNING, \
     DECENTRALIZED_FEDERATED_LEARNING
 
-from constants.topology_constants import  TOPOLOGY_STAR, TOPOLOGY_RING, TOPOLOGY_MESH, TOPOLOGY_CUSTOM
+from constants.topology_constants import  TOPOLOGY_STAR, TOPOLOGY_RING, TOPOLOGY_K_CONNECT, TOPOLOGY_CUSTOM
 
 from constants.models_constants import (
     MODEL_CNN,
@@ -83,6 +83,7 @@ class ConfigValidator:
             pretrained_models: bool = False,
             federated_learning_schema: str = None,
             federated_learning_topology: str = None,
+            client_k_neighbors: int = None,
             client_role: str = None,
             client_sampling_rate: float = 1.0,
             aggregation_strategy: str = None,
@@ -131,6 +132,7 @@ class ConfigValidator:
         self.PRETRAINED_MODELS = pretrained_models
         self.FEDERATED_LEARNING_SCHEMA = self._federated_learning_schema(federated_learning_schema)
         self.FEDERATED_LEARNING_TOPOLOGY = self._schem_n_toplogy_macher(federated_learning_schema, federated_learning_topology)
+        self.CLIENT_K_NEIGHBORS = self._validate_client_k_neighbors(number_of_clients, federated_learning_topology, client_k_neighbors)
         self.CLIENT_ROLE = self._client_role(client_role)
         self.CLIENT_SAMPLING_RATE = client_sampling_rate
         self.AGGREGATION_STRATEGY = self._aggregation_strategy(aggregation_strategy)
@@ -412,3 +414,16 @@ class ConfigValidator:
         ]:
             raise TypeError(f"unknown aggregation_strategy type: {aggregation_strategy}")
         return aggregation_strategy
+    
+    def _validate_client_k_neighbors(self, number_of_clients: int, federated_learning_topology: str, client_k_neighbors: int):
+        if federated_learning_topology == 'k_connect' and client_k_neighbors is not None:
+            if number_of_clients > client_k_neighbors > 1: 
+                return client_k_neighbors
+            else: 
+                raise TypeError(f"number_of_clients must be greater than client_k_neighbors and client_k_neighbors must be greater than 1"
+                                f" while the federated_learning_topology is k_connect")
+        elif federated_learning_topology == 'k_connect' and client_k_neighbors is None:
+            raise TypeError(f"client_k_neighbors is None while the federated_learning_topology is k_connect")
+        else:
+            return None
+        

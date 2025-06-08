@@ -2,6 +2,7 @@ import ray
 import networkx as nx
 import numpy as np
 
+from utils.topology_generator import generate_k_connected_graph_from_nodes
 from constants.framework import TOPOLOGY_MANAGER_CPU_RESOURCES
 from constants.topology_constants import *
 from .message import Message
@@ -35,7 +36,7 @@ class TopologyManager:
         return [neigh for neigh in self._graph.neighbors(node_id)]
 
     # RvQ: Namana?
-    def link_nodes(self, node_ids: List[str], topology: Union[str, np.ndarray]):
+    def link_nodes(self, node_ids: List[str], topology: Union[str, np.ndarray], k: Optional[int] = None):
         if len(node_ids) < 2:
             raise ValueError("At least 2 nodes are required to setup the topology.")
         self._node_ids = node_ids
@@ -48,15 +49,21 @@ class TopologyManager:
         if isinstance(self._topology, str):
             if self._topology == TOPOLOGY_STAR:
                 self._graph = nx.star_graph(self._node_ids)
-            elif self._topology == TOPOLOGY_MESH:
-                self._graph = nx.complete_graph(self._node_ids)
+            elif self._topology == TOPOLOGY_K_CONNECT:
+                
+                self._graph = generate_k_connected_graph_from_nodes(self._node_ids, k)
+                # Relabel nodes to use actual node_ids instead of 0,1,2...
+                mapping = {i: self._node_ids[i] for i in range(len(self._node_ids))}
+                self._graph = nx.relabel_nodes(self._graph, mapping)
+                
+                nx.draw(self._graph, with_labels=True)
+                plt.show()
             elif self._topology == TOPOLOGY_RING:
+                print(f"the node_ids are {type(self._node_ids)} and the node itself is {type(self._node_ids[0])}")
                 self._topology = nx.cycle_graph(self._node_ids)
                 self._graph = nx.cycle_graph(self._node_ids)
                 nx.draw(self._graph, with_labels=True)
                 plt.show()
-                print(f"<============================================================ {topology}")
-                nx.draw(self._topology)
             elif self._topology == TOPOLOGY_CUSTOM:
                 #self._graph = nx.from_numpy_array(np.array(self.adjacency_matrix))
                 '''
@@ -70,7 +77,7 @@ class TopologyManager:
                 
                 Make sure adjacency_matrix is square and matches the number of nodes.
 
-                If your nodes have IDs other than 0, 1, ..., n-1, you’ll need to relabel the graph after creation
+                If your nodes have IDs other than 0, 1, ..., n-1, you'll need to relabel the graph after creation
                 
                        This goes here? |
                                        V

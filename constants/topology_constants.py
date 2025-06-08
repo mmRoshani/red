@@ -1,4 +1,4 @@
 TOPOLOGY_STAR = "star"
-TOPOLOGY_MESH = "mesh"
+TOPOLOGY_K_CONNECT = "k_connect"
 TOPOLOGY_RING = "ring"
 TOPOLOGY_CUSTOM = "custom"
