@@ -6,9 +6,9 @@ random_seed: 42
 federation_id: '1.x.y'
 # RvQ: What is the meaning of CLusteredFederatedLearning?
 # TraditionalFederatedLearning | DecentralizedFederatedLearning | ClusterFederatedLearningSchema
-federated_learning_schema: 'DecentralizedFederatedLearning'
+federated_learning_schema: 'TraditionalFederatedLearning'
 # The network topology of the federated learning: star, k_connect, ring, custom (given an adjacency matrix)
-federated_learning_topology: 'k_connect'
+federated_learning_topology: 'star'
 # For k_connect topology 
 client_k_neighbors: 3
 

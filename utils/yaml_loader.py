@@ -27,6 +27,11 @@ def load_objectified_yaml(yaml_path: str):
     yaml_obj = yaml_to_object(config)
 
     config_dict = {
+        'federated_learning_schema': None,
+        'federated_learning_topology': None,
+        'client_k_neighbors': None,
+        'client_role': None,
+        'federation_id': "",
         "device": "cuda",
         "gpu_index": 0,
         "random_seed": 42,
@@ -68,11 +73,7 @@ def load_objectified_yaml(yaml_path: str):
         "save_global_models": False,
         "mean_accuracy_to_csv": True,
         "use_global_accuracy_for_noniid": True,
-        'federated_learning_schema': None,
-        'federated_learning_topology': None,
-        'client_k_neighbors': None,
-        'client_role': None,
-        'federation_id': "",
+
     }
 
     with open(yaml_path, "r") as f:
