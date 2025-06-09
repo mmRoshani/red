@@ -26,8 +26,7 @@ def load_objectified_yaml(yaml_path: str):
 
     yaml_obj = yaml_to_object(config)
 
-    default_config = {
-
+    config_dict = {
         "device": "cuda",
         "gpu_index": 0,
         "random_seed": 42,
@@ -80,6 +79,6 @@ def load_objectified_yaml(yaml_path: str):
         yaml_config = yaml.safe_load(f)
 
     if yaml_config:
-        default_config.update(yaml_config)
+        config_dict.update(yaml_config)
 
-    return default_config
+    return config_dict
