@@ -1,4 +1,4 @@
-device: 'cpu'
+device: 'cuda'
 gpu_index: "0"
 
 federation_id: '1.x.y'
