@@ -20,5 +20,5 @@ fi
 if [ ! -d "data/by_play_and_character" ]; then
    echo "------------------------------"
    echo "dividing txt data between users"
-   python3 src/datasets/text/shakespeare/preprocess_shakespeare.py data/raw_data.txt data/
+   python3 /datasets/text/shakespeare/preprocess_shakespeare.py data/raw_data.txt data/
 fi
