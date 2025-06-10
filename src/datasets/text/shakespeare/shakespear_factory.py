@@ -1,5 +1,4 @@
-import osSHAKESPEARE_RAW_DATA_PATH = "datasets/by_play_and_character"
-SHAKESPEARE_TARGET_PATH = "shakespear_data/"
+import os
 import re
 import time
 import random

@@ -6,7 +6,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from typing import List, Union
 import numpy as np
-from src.constants.topology_constants import TOPOLOGY_STAR, TOPOLOGY_RING, TOPOLOGY_MESH, TOPOLOGY_CUSTOM
+from src.constants.topology_constants import TOPOLOGY_STAR, TOPOLOGY_RING, TOPOLOGY_CUSTOM, TOPOLOGY_K_CONNECT
 
 
 def create_topology_graph(node_ids: List[str], topology: Union[str, np.ndarray]) -> nx.Graph:
@@ -22,23 +22,21 @@ def create_topology_graph(node_ids: List[str], topology: Union[str, np.ndarray])
     """
     if isinstance(topology, str):
         if topology == TOPOLOGY_STAR:
-            # Create star topology with first node as center
             graph = nx.star_graph(len(node_ids) - 1)
-            # Relabel nodes with actual node IDs
             mapping = {i: node_ids[i] for i in range(len(node_ids))}
             return nx.relabel_nodes(graph, mapping)
             
         elif topology == TOPOLOGY_RING:
-            # Create ring topology
             graph = nx.cycle_graph(len(node_ids))
             mapping = {i: node_ids[i] for i in range(len(node_ids))}
             return nx.relabel_nodes(graph, mapping)
             
-        elif topology == TOPOLOGY_MESH:
-            # Create complete graph (mesh topology)
-            graph = nx.complete_graph(node_ids)
-            return graph
-            
+        elif topology == TOPOLOGY_K_CONNECT:
+            #TODO: add k topology diagram
+            raise ValueError("topology diagram needs to implemented")
+            # graph = nx.complete_graph(node_ids)
+            # return graph
+            pass
         else:
             raise ValueError(f"Unknown topology type: {topology}")
             

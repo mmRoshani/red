@@ -1,0 +1,1 @@
+from src.core.management.resources import get_resources_split

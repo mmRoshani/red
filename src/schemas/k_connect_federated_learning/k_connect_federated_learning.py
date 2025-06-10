@@ -2,11 +2,12 @@ from src.constants import MODEL_UPDATE, SERVER_ID, MESSAGE_BODY_STATES
 from src.core.communication.message import Message
 from src.core.federated import FederatedNode
 from src.decorators.remote import remote
-from src.nets import network_factory
 import copy
 from typing import Dict, List
 import torch
 from torch.nn import Module as NN
+
+from src.nets.network_factory import network_factory
 from src.utils.checker import device_checker
 from src.utils.get_last_char_as_int import get_last_char_as_int
 from src.validators.config_validator import ConfigValidator

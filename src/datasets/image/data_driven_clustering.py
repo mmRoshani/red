@@ -1,7 +1,7 @@
 from sklearn.cluster import AffinityPropagation
 from sklearn.metrics.pairwise import cosine_similarity
 
-from data.image.label_distribution import calculate_label_distribution
+from src.datasets.image.label_distribution import calculate_label_distribution
 from src.utils.log import Log
 from src.validators.config_validator import ConfigValidator
 
