@@ -17,8 +17,12 @@ from utils.log import Log
 import torch
 
 def k_connect_federated_learning_executor(config: ConfigValidator, log: Log):
-
-    ray.init()
+    # TODO: read from .env files
+    runtime_env = {
+        "working_dir": "/home/amir/red",
+        "excludes": ["/home/amir/red/.git/objects/ff/2f5a96367a3c1656f09c93649f07143ff8b11e"]
+    }
+    ray.init(runtime_env=runtime_env) 
 
     federation = KConnectFederatedLearningSchema(
         client_template=KConnectFederatedLearning,

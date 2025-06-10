@@ -93,14 +93,12 @@ class KConnectFederatedLearningSchema(FederatedBase):
             self._tp_manager = _get_or_create_broker(
                 self._pg, self._fed_id, self._bundle_offset
             )
-        print(f"================================> Self._tmp_manager is: {self._tp_manager}")
         train_nodes = []
         for i, node in enumerate(self._nodes, start=1 + self._bundle_offset):
             if "train" in node.role:
                 if not node.built:
                     node.build(i, self._pg)
                 train_nodes.append(node)
-               
         ray.get(
             self._tp_manager.link_nodes.remote(
                 [node.id for node in train_nodes], self._topology, self.config.CLIENT_K_NEIGHBORS

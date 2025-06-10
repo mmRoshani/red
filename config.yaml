@@ -1,4 +1,4 @@
-device: 'cpu'
+device: 'cuda'
 gpu_index: "0"
 
 federation_id: '1.x.y'
@@ -8,10 +8,11 @@ federated_learning_schema: 'DecentralizedFederatedLearning'
 # The network topology of the federated learning: star, k_connect, ring, custom (given an adjacency matrix)
 federated_learning_topology: 'k_connect'
 # For k_connect topology 
-client_k_neighbors: 3
+client_k_neighbors: 2
 
 # train | test | eval | train-test-eval | train-eval | etc.
 client_role: 'train' # RvQ: We got clients that only train or only evaluate?
+adjacency_matrix: ./adjacency_matrix.csv 
 
 learning_rate: 0.001
 model_type: "cnn"
@@ -40,12 +41,12 @@ test_batch_size: 28
 transform_input_size: 28
 weight_decay: null
 
-number_of_clients: 4
+number_of_clients: 5
 client_sampling_rate: 1.0
 pre_computed_data_driven_clustering: false
 do_cluster: true
 clustering_period: 6
-federated_learning_rounds: 6
+federated_learning_rounds: 15
 stop_avg_accuracy: 1.0
 save_before_aggregation_models: false
 save_global_models: false

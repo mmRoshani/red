@@ -20,8 +20,8 @@ from utils.log import Log
 import torch
 
 def star_federated_learning_executor(config: ConfigValidator, log: Log):
-
-    ray.init()
+    # TODO: read from .env files
+    ray.init(runtime_env={"working_dir": "/home/amir/red", 'excludes': ['/home/amir/red/.git/objects/ff/2f5a96367a3c1656f09c93649f07143ff8b11e']}) 
 
     federation = StarFederatedLearningSchema(
         server_template=StarFederatedLearningServer,
