@@ -1,12 +1,14 @@
-device: 'cpu'
+device: 'cuda'
 gpu_index: "0"
+
+random_seed: 42
 
 federation_id: '1.x.y'
 # RvQ: What is the meaning of CLusteredFederatedLearning?
 # TraditionalFederatedLearning | DecentralizedFederatedLearning | ClusterFederatedLearningSchema
-federated_learning_schema: 'DecentralizedFederatedLearning'
+federated_learning_schema: 'TraditionalFederatedLearning'
 # The network topology of the federated learning: star, k_connect, ring, custom (given an adjacency matrix)
-federated_learning_topology: 'k_connect'
+federated_learning_topology: 'star'
 # For k_connect topology 
 client_k_neighbors: 3
 
@@ -15,8 +17,11 @@ client_role: 'train' # RvQ: We got clients that only train or only evaluate?
 
 learning_rate: 0.001
 model_type: "cnn"
+transformer_model_size: "base"
 pretrained_models: false
 dataset_type: "fmnist"
+loss_function: "CrossEntropy"
+optimizer: "adam"
 
 data_distribution_kind: "30"
 desired_distribution: null
@@ -28,6 +33,11 @@ sensitivity_percentage: 100
 remove_common_ids: false
 # RvQ:
 fed_avg: false
+
+chunking: false                    # Enable chunking
+chunking_with_gradients: false     # CRITICAL: MUST be true when chunking=true for importance analysis
+chunking_parts: 100               # Divide model into 50 equal chunks
+chunking_random_section: false    # Use importance-based selection (not random)
 
 # FedAvg | FedProx
 aggregation_strategy: "FedAvg"
@@ -50,3 +60,5 @@ stop_avg_accuracy: 1.0
 save_before_aggregation_models: false
 save_global_models: false
 
+mean_accuracy_to_csv: true
+use_global_accuracy_for_noniid: true  # Use global accuracy for non-IID evaluation (recommended) 

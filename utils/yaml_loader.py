@@ -1,5 +1,11 @@
+import copy
 import yaml
 from collections import namedtuple
+from typing import Dict, Any
+from pathlib import Path
+from constants.models_constants import TRANSFORMER_MODEL_SIZE_BASE
+from constants.loss_constants import LOSS_CROSS_ENTROPY, LOSS_MASKED_CROSS_ENTROPY, LOSS_SMOOTHED_CROSS_ENTROPY
+from constants.optimizer_constants import OPTIMIZER_ADAM
 
 
 def yaml_to_object(data):
@@ -21,41 +27,59 @@ def load_objectified_yaml(yaml_path: str):
     yaml_obj = yaml_to_object(config)
 
     config_dict = {
-        'model_type': getattr(yaml_obj, 'model_type', None),
-        'dataset_type': getattr(yaml_obj, 'dataset_type', None),
-        'data_distribution_kind': getattr(yaml_obj, 'data_distribution_kind', None),
-        'distance_metric': getattr(yaml_obj, 'distance_metric', None),
-        'number_of_epochs': getattr(yaml_obj, 'number_of_epochs', None),
-        'sensitivity_percentage': getattr(yaml_obj, 'sensitivity_percentage', None),
-        'dynamic_sensitivity_percentage': getattr(yaml_obj, 'dynamic_sensitivity_percentage', True),
-        'train_batch_size': getattr(yaml_obj, 'train_batch_size', None),
-        'test_batch_size': getattr(yaml_obj, 'test_batch_size', None),
-        'transform_input_size': getattr(yaml_obj, 'transform_input_size', None),
-        'weight_decay': getattr(yaml_obj, 'weight_decay', 1e-4),
-        'number_of_clients': getattr(yaml_obj, 'number_of_clients', 10),
-        'dirichlet_beta': getattr(yaml_obj, 'dirichlet_beta', 0.1),
-        'save_before_aggregation_models': getattr(yaml_obj, 'save_before_aggregation_models', True),
-        'save_global_models': getattr(yaml_obj, 'save_global_models', True),
-        'do_cluster': getattr(yaml_obj, 'do_cluster', True),
-        'clustering_period': getattr(yaml_obj, 'clustering_period', 6),
-        'federated_learning_rounds': getattr(yaml_obj, 'federated_learning_rounds', 6),
-        'gpu_index': getattr(yaml_obj, 'gpu_index', None),
-        'device': getattr(yaml_obj, 'device', None),
-        'stop_avg_accuracy': getattr(yaml_obj, 'stop_avg_accuracy', None),
-        'remove_common_ids': getattr(yaml_obj, 'remove_common_ids', False),
-        'fed_avg': getattr(yaml_obj, 'fed_avg', False),
-        'pre_computed_data_driven_clustering': getattr(yaml_obj, 'pre_computed_data_driven_clustering', False),
-        'distance_metric_on_parameters': getattr(yaml_obj, 'distance_metric_on_parameters', False),
-        'pretrained_models': getattr(yaml_obj, 'pretrained_models', False),
-        'federated_learning_schema': getattr(yaml_obj, 'federated_learning_schema', None),
-        'federated_learning_topology': getattr(yaml_obj, 'federated_learning_topology', None),
-        'client_k_neighbors': getattr(yaml_obj, 'client_k_neighbors', None),
-        'client_role': getattr(yaml_obj, 'client_role', None),
-        'client_sampling_rate': getattr(yaml_obj, 'client_sampling_rate', None),
-        'aggregation_strategy': getattr(yaml_obj, 'aggregation_strategy', None),
-        'aggregation_sample_scaling': getattr(yaml_obj, 'aggregation_sample_scaling', False),
-        'federation_id': getattr(yaml_obj, 'federation_id', ""),
-        'learning_rate': getattr(yaml_obj, 'learning_rate', "0.001"),
+        'federated_learning_schema': None,
+        'federated_learning_topology': None,
+        'client_k_neighbors': None,
+        'client_role': None,
+        'federation_id': "",
+        "device": "cuda",
+        "gpu_index": 0,
+        "random_seed": 42,
+        "learning_rate": "0.001",
+        "model_type": None,
+        "transformer_model_size": TRANSFORMER_MODEL_SIZE_BASE,
+        "pretrained_models": False,
+        "dataset_type": None,
+        "loss_function": LOSS_CROSS_ENTROPY,
+        "optimizer": OPTIMIZER_ADAM,
+        "data_distribution_kind": None,
+        "desired_distribution": None,
+        "dirichlet_beta": 0.1,
+        "distance_metric": None,
+        "dynamic_sensitivity_percentage": True,
+        "sensitivity_percentage": None,
+        "remove_common_ids": False,
+        "fed_avg": False,
+        "chunking": False,
+        "chunking_with_gradients": True,
+        "chunking_parts": 5.0,
+        "chunking_random_section": False,
+        "aggregation_strategy": None,
+        "aggregation_sample_scaling": False,
+        "distance_metric_on_parameters": False,
+        "number_of_epochs": None,
+        "train_batch_size": None,
+        "test_batch_size": None,
+        "transform_input_size": None,
+        "weight_decay": 1e-4,
+        "number_of_clients": 10,
+        "client_sampling_rate": 1.0,
+        "pre_computed_data_driven_clustering": False,
+        "do_cluster": True,
+        "clustering_period": 6,
+        "federated_learning_rounds": 6,
+        "stop_avg_accuracy": None,
+        "save_before_aggregation_models": False,
+        "save_global_models": False,
+        "mean_accuracy_to_csv": True,
+        "use_global_accuracy_for_noniid": True,
+
     }
+
+    with open(yaml_path, "r") as f:
+        yaml_config = yaml.safe_load(f)
+
+    if yaml_config:
+        config_dict.update(yaml_config)
 
     return config_dict

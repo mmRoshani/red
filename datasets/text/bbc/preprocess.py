@@ -4,7 +4,9 @@ from torch.utils.data import Dataset, DataLoader, random_split
 from transformers import BertTokenizer
 from sklearn.model_selection import train_test_split
 
-# Dummy placeholder for robust_read and TextDataset
+from utils.log import Log
+from validators.config_validator import ConfigValidator
+
 def robust_read(path):
     with open(path, 'r', encoding='utf-8', errors='ignore') as f:
         return f.read()
@@ -22,23 +24,29 @@ class TextDataset(Dataset):
     def __len__(self):
         return len(self.labels)
 
-def load_and_tokenize(data_dir, config, pretrained_model='bert-base-uncased', max_length=512, pad_to_max=True, test_size=0.2, shuffle=True):
-# (#
-#     data_dir,
-#     config,
-#     pretrained_model='bert-base-uncased',
-#     max_length=512, # todo I thin max_lenght is defined in the config
-#     pad_to_max=True,
-#     test_size=0.2,
-#     shuffle=True
-# ):
-    # 1. Gather texts and labels
+def load_and_tokenize(
+        data_dir: str,
+        config: 'ConfigValidator',
+        log: 'Log',
+        pretrained_model: str = 'bert-base-uncased',
+        max_length: int = 512,
+        pad_to_max: bool = True,
+        test_size: float = 0.2,  # ignored now
+        shuffle: bool = True     # used only in dataloader
+):
     train_loaders = []
     test_loaders = []
 
     tokenizer = BertTokenizer.from_pretrained(pretrained_model)
-    data_dir += "/bbc"
-    # Iterate over client directories
+
+    data_dir = os.path.abspath(os.path.expanduser(data_dir))
+    test_dir = os.path.abspath(os.path.expanduser(data_dir.replace("bbc_train", "bbc_test")))
+
+    if not data_dir.rstrip('/').endswith('bbc_train'):
+        data_dir += "/bbc_train"
+    if not test_dir.rstrip('/').endswith('bbc_test'):
+        test_dir += "/bbc_test"
+
     for client_name in sorted(os.listdir(data_dir)):
         client_path = os.path.join(data_dir, client_name)
         if not os.path.isdir(client_path):
@@ -50,11 +58,14 @@ def load_and_tokenize(data_dir, config, pretrained_model='bert-base-uncased', ma
         labels = []
         label2id = {}
 
-        # Read each label directory in the client folder
         for label_id, label_name in enumerate(sorted(os.listdir(client_path))):
             label_path = os.path.join(client_path, label_name)
-            if not os.path.isdir(label_path):
+            
+            if not os.path.isdir(client_path) or not os.path.isdir(client_path):
                 continue
+
+            log.info(f'Preprocessing client no #: {client_name}')
+
 
             label2id[label_name] = label_id
 
@@ -65,40 +76,70 @@ def load_and_tokenize(data_dir, config, pretrained_model='bert-base-uncased', ma
                     texts.append(raw.strip())
                     labels.append(label_id)
 
-        if not texts:  # If client has no datasets, skip
+        if not texts:
             continue
 
-        # Tokenization
-        encodings = tokenizer(
-            texts,
+        # -------- TRAIN DATA --------
+        train_texts, train_labels = [], []
+        label2id = {}
+
+        for label_id, label_name in enumerate(sorted(os.listdir(train_client_path))):
+            label_path = os.path.join(train_client_path, label_name)
+            if not os.path.isdir(label_path):
+                continue
+
+            label2id[label_name] = label_id
+
+            for fn in os.listdir(label_path):
+                if fn.lower().endswith('.txt'):
+                    path = os.path.join(label_path, fn)
+                    raw = robust_read(path)
+                    train_texts.append(raw.strip())
+                    train_labels.append(label_id)
+
+        if not train_texts:
+            continue
+
+        train_encodings = tokenizer(
+            train_texts,
             max_length=max_length,
             padding='max_length' if pad_to_max else True,
             truncation=True,
             return_tensors='pt'
         )
-
-        # Train/test split
-        train_idx, test_idx = train_test_split(
-            list(range(len(labels))),
-            test_size=test_size,
-            shuffle=shuffle,
-            stratify=labels
-        )
-
-        train_encodings = {key: val[train_idx] for key, val in encodings.items()}
-        test_encodings = {key: val[test_idx] for key, val in encodings.items()}
-        train_labels = [labels[i] for i in train_idx]
-        test_labels = [labels[i] for i in test_idx]
-
         train_dataset = TextDataset(train_encodings, train_labels)
-        test_dataset = TextDataset(test_encodings, test_labels)
-
-        train_loader = DataLoader(train_dataset, batch_size=config.TRAIN_BATCH_SIZE, shuffle=True)
-        test_loader = DataLoader(test_dataset, batch_size=config.TEST_BATCH_SIZE, shuffle=True)
-
+        train_loader = DataLoader(train_dataset, batch_size=config.TRAIN_BATCH_SIZE, shuffle=shuffle)
         train_loaders.append(train_loader)
+
+        # -------- TEST DATA --------
+        test_texts, test_labels = [], []
+
+        for label_name in sorted(label2id.keys()):
+            label_id = label2id[label_name]
+            label_path = os.path.join(test_client_path, label_name)
+            if not os.path.isdir(label_path):
+                continue
+
+            for fn in os.listdir(label_path):
+                if fn.lower().endswith('.txt'):
+                    path = os.path.join(label_path, fn)
+                    raw = robust_read(path)
+                    test_texts.append(raw.strip())
+                    test_labels.append(label_id)
+
+        if not test_texts:
+            continue
+
+        test_encodings = tokenizer(
+            test_texts,
+            max_length=max_length,
+            padding='max_length' if pad_to_max else True,
+            truncation=True,
+            return_tensors='pt'
+        )
+        test_dataset = TextDataset(test_encodings, test_labels)
+        test_loader = DataLoader(test_dataset, batch_size=config.TEST_BATCH_SIZE, shuffle=shuffle)
         test_loaders.append(test_loader)
 
     return train_loaders, test_loaders
-
 

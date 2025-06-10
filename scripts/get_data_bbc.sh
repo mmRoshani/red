@@ -43,8 +43,8 @@ fi
 
 # Run your data splitting script if needed
 BBC_ARTICLES_PATH="$EXTRACTED_PATH/BBC News Summary/News Articles"
-if [ -f "src/datasets/text/bbc/data_spliting.py" ]; then
-    python3 src/datasets/text/bbc/data_spliting.py --directory "$BBC_ARTICLES_PATH" --output ../../../../data/bbc --max 3
+if [ -f "/datasets/text/bbc/data_spliting.py" ]; then
+    python3 /datasets/text/bbc/data_spliting.py --directory "$BBC_ARTICLES_PATH" --output ../../../../data/bbc --max 3
 else
     echo "Warning: data_spliting.py not found. Skipping data splitting."
 fi

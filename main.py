@@ -20,7 +20,7 @@ def main(config_yaml_path: str = "./config.yaml"):
 
     config_dict = load_objectified_yaml(config_yaml_path)
 
-    config_dict = config_dict | {'desired_distribution': None} # TODO: update
+    config_dict = config_dict | {"desired_distribution": None}  # TODO: update
 
     config = ConfigValidator(**config_dict)
 
@@ -67,5 +67,4 @@ def main(config_yaml_path: str = "./config.yaml"):
     schema_runner_fn(config, log)
 
 if __name__ == "__main__":
-    #typer.run(main)
     main()
