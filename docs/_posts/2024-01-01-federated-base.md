@@ -155,8 +155,8 @@ def test(self, phase: Literal["train", "eval", "test"], **kwargs) -> List:
 ### Star Topology Federation
 
 ```python
-from core.federated import FederatedBase
-from core.federated.virtual_node import VirtualNode
+from src.core.federated import FederatedBase
+from src.core.federated import VirtualNode
 
 # Create virtual nodes
 nodes = [

@@ -33,7 +33,7 @@ Ray is the distributed computing backbone that makes Red a production-grade fede
 import ray
 from ray.util.placement_group import PlacementGroup, placement_group
 from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
-from decorators.remote import remote
+from src.decorators.remote import remote
 ```
 
 #### 1. **Remote Actors for Nodes**
@@ -160,13 +160,16 @@ def remote(*args, **kwargs):
 ```
 
 #### Usage:
+
 ```python
-from decorators.remote import remote
+from src.decorators.remote import remote
+
 
 @remote
 class FederatedClient:
     # Automatically gets max_concurrency=100
     pass
+
 
 @remote(max_concurrency=200, num_gpus=1)
 class HighThroughputClient:

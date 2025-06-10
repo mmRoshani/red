@@ -1,8 +1,0 @@
-MODEL_CNN = "cnn"
-MODEL_LENET = "LENET"
-MODEL_RESNET_18 = "resnet18"
-MODEL_RESNET_50 = "resnet50"
-MODEL_MOBILENET = "mobilenet"
-MODEL_VGG = "vgg16"
-MODEL_VIT = "vit"
-MODEL_SWIN = "swin"

@@ -548,10 +548,10 @@ class HighThroughputNode(FederatedNode):
 ### Basic Federation Setup
 
 ```python
-from validators.config_validator import ConfigValidator
-from utils.yaml_loader import load_objectified_yaml
-from utils.log import Log
-from schemas.star_federated_learning.star_federated_learning_executor import star_federated_learning_executor
+from src.validators.config_validator import ConfigValidator
+from src.utils.yaml_loader import load_objectified_yaml
+from src.utils.log import Log
+from src.schemas.star_federated_learning.star_federated_learning_executor import star_federated_learning_executor
 
 # Load configuration
 config_dict = load_objectified_yaml("config.yaml")
@@ -567,37 +567,39 @@ star_federated_learning_executor(config, log)
 ### Custom Node Implementation
 
 ```python
-from core.federated import FederatedNode
+from src.core.federated import FederatedNode
 import torch
+
 
 class CustomClientNode(FederatedNode):
     def build(self, **kwargs):
         self.model = self.create_model()
         self.data_loader = self.get_data()
-        
+
     def train(self, optimizer_fn, loss_fn, **kwargs):
         # Custom training logic
         optimizer = optimizer_fn(self.model.parameters())
         criterion = loss_fn()
-        
+
         for data, target in self.data_loader:
             optimizer.zero_grad()
             output = self.model(data)
             loss = criterion(output, target)
             loss.backward()
             optimizer.step()
-            
+
         # Update version
         self.update_version(weights=self.model.state_dict())
-        
+
         return {"loss": loss.item()}
 ```
 
 ### Custom Federation Schema
 
 ```python
-from core.federated import FederatedBase
-from core.federated.virtual_node import VirtualNode
+from src.core.federated import FederatedBase
+from src.core.federated import VirtualNode
+
 
 class CustomFederation(FederatedBase):
     def __init__(self, node_template, num_nodes, config, log):
@@ -606,7 +608,7 @@ class CustomFederation(FederatedBase):
             for i in range(num_nodes)
         ]
         super().__init__(nodes=nodes, topology="mesh", config=config)
-        
+
     def train(self, **kwargs):
         # Custom training coordination
         pass
@@ -642,7 +644,8 @@ federation.num_nodes  # Number of nodes
 federation.pull_version(["client_1", "client_2"])  # Get versions
 
 # Resource monitoring
-from utils.resources import monitor_cluster_resources
+from src.utils import monitor_cluster_resources
+
 resources = monitor_cluster_resources()
 ```
 

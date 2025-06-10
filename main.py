@@ -1,17 +1,17 @@
 import os
-from core.clustering.data_driven import calculate_label_distribution
-from datasets.load_and_prepare_data_base_on_type import determine_dataset_type
-from schemas import schema_factory
-from utils.client_ids_list import client_ids_list_generator
-from utils.framework_setup import FrameworkSetup
-from utils.log import Log
-from utils.log_path import log_path
-from utils.variable_name import var_name
-from utils.yaml_loader import load_objectified_yaml
-from utils.checker import none_checker
+from src.core.clustering.data_driven import calculate_label_distribution
+from src.datasets import determine_dataset_type
+from src.schemas import schema_factory
+from src.utils import client_ids_list_generator
+from src.utils.framework_setup import FrameworkSetup
+from src.utils.log import Log
+from src.utils import log_path
+from src.utils import var_name
+from src.utils.yaml_loader import load_objectified_yaml
+from src.utils import none_checker
 import typer
-from validators.config_validator import ConfigValidator
-from validators.runtime_config import RuntimeConfig
+from src.validators.config_validator import ConfigValidator
+from src.validators.runtime_config import RuntimeConfig
 
 
 

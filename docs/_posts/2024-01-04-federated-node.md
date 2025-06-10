@@ -384,8 +384,9 @@ def health_check(self):
 ### Basic Client Node
 
 ```python
-from core.federated import FederatedNode
+from src.core.federated import FederatedNode
 import torch
+
 
 class SimpleClientNode(FederatedNode):
     def build(self, **kwargs):
@@ -393,13 +394,13 @@ class SimpleClientNode(FederatedNode):
         self.model = self.create_model()
         self.train_loader = self.get_train_data()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        
+
     def train(self, optimizer_fn, loss_fn, **kwargs):
         # Standard federated learning training
         self.model.train()
         optimizer = optimizer_fn(self.model.parameters(), lr=0.01)
         criterion = loss_fn()
-        
+
         for data, target in self.train_loader:
             data, target = data.to(self.device), target.to(self.device)
             optimizer.zero_grad()
@@ -407,10 +408,10 @@ class SimpleClientNode(FederatedNode):
             loss = criterion(output, target)
             loss.backward()
             optimizer.step()
-            
+
         # Update version with new weights
         self.update_version(weights=self.model.state_dict())
-        
+
         return {"loss": loss.item(), "samples": len(self.train_loader)}
 ```
 

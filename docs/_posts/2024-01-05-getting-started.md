@@ -77,25 +77,27 @@ federated_learning_rounds: 5
 ```python
 # quickstart.py
 import ray
-from schemas.star_federated_learning.star_federated_learning_executor import star_federated_learning_executor
-from validators.config_validator import ConfigValidator
-from utils.yaml_loader import load_objectified_yaml
-from utils.log import Log
+from src.schemas.star_federated_learning.star_federated_learning_executor import star_federated_learning_executor
+from src.validators.config_validator import ConfigValidator
+from src.utils.yaml_loader import load_objectified_yaml
+from src.utils.log import Log
 import torch
+
 
 def main():
     # Load configuration
     config_dict = load_objectified_yaml("./config.yaml")
     config = ConfigValidator(**config_dict)
-    
+
     # Initialize logging
     log = Log("quickstart", config.MODEL_TYPE, config.DISTANCE_METRIC)
     log.info("Starting Red Federated Learning Quickstart")
-    
+
     # Run federated learning
     star_federated_learning_executor(config, log)
-    
+
     log.info("Federated learning completed successfully!")
+
 
 if __name__ == "__main__":
     main()
@@ -201,9 +203,10 @@ ray.init(
 ### Creating Custom Nodes
 
 ```python
-from core.federated import FederatedNode
+from src.core.federated import FederatedNode
 import torch
 import torch.nn as nn
+
 
 class MyCustomClient(FederatedNode):
     def build(self, **kwargs):
@@ -212,7 +215,7 @@ class MyCustomClient(FederatedNode):
         self.train_loader = self.get_data_loader()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model.to(self.device)
-    
+
     def create_model(self):
         """Define your model architecture"""
         return nn.Sequential(
@@ -228,28 +231,28 @@ class MyCustomClient(FederatedNode):
             nn.Dropout(0.5),
             nn.Linear(128, 10)
         )
-    
+
     def train(self, optimizer_fn, loss_fn, **kwargs):
         """Implement your training logic"""
         self.model.train()
         optimizer = optimizer_fn(self.model.parameters(), lr=0.01)
         criterion = loss_fn()
-        
+
         total_loss = 0
         for batch_idx, (data, target) in enumerate(self.train_loader):
             data, target = data.to(self.device), target.to(self.device)
-            
+
             optimizer.zero_grad()
             output = self.model(data)
             loss = criterion(output, target)
             loss.backward()
             optimizer.step()
-            
+
             total_loss += loss.item()
-        
+
         # Update version with new model state
         self.update_version(weights=self.model.state_dict())
-        
+
         return {
             "loss": total_loss / len(self.train_loader),
             "samples": len(self.train_loader.dataset)
@@ -259,10 +262,11 @@ class MyCustomClient(FederatedNode):
 ### Custom Federation Schema
 
 ```python
-from core.federated import FederatedBase
-from core.federated.virtual_node import VirtualNode
+from src.core.federated import FederatedBase
+from src.core.federated import VirtualNode
 import ray
 import threading
+
 
 class MyCustomFederation(FederatedBase):
     def __init__(self, client_template, num_clients, config, log, **kwargs):
@@ -271,34 +275,34 @@ class MyCustomFederation(FederatedBase):
             VirtualNode(client_template, f"client_{i}", "train", config, log)
             for i in range(num_clients)
         ]
-        
+
         super().__init__(
             nodes=nodes,
             topology="star",  # or your custom topology
             config=config,
             **kwargs
         )
-    
+
     def train(self, client_args, blocking=False):
         """Implement your federated learning algorithm"""
         # Build and setup nodes
         for i, node in enumerate(self._nodes):
             if not node.built:
                 node.build(i + 1, self._pg)
-        
+
         # Initialize topology manager
         if self._tp_manager is None:
             self._tp_manager = self.create_topology_manager()
-        
+
         # Setup communication
         ray.get([node.handle._setup_train.remote() for node in self._nodes])
-        
+
         # Start training
         self._runtime_remotes = [
             node.handle._train.remote(**client_args)
             for node in self._nodes
         ]
-        
+
         if blocking:
             results = ray.get(self._runtime_remotes)
             return results
@@ -318,7 +322,7 @@ Access the Ray dashboard at `http://localhost:8265` to monitor:
 Red provides comprehensive logging:
 
 ```python
-from utils.log import Log
+from src.utils.log import Log
 
 log = Log("my-experiment", "cnn", "coordinate")
 log.info("Starting experiment")
