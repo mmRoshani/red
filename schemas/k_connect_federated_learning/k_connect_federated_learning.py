@@ -1,4 +1,4 @@
-from constants.framework import MODEL_UPDATE, SERVER_ID, MESSAGE_BODY_STATES
+from constants.framework import MODEL_UPDATE, SERVER_ID, MESSAGE_BODY_STATES, MESSAGE_BODY_NORM, SIMMILARITY_REQUEST,SIMMILARITY_REQUEST_ACCEPT
 from core.communication.message import Message
 from core.federated import FederatedNode
 from decorators.remote import remote
@@ -17,6 +17,7 @@ from utils.client_ids_list import client_ids_list_generator
 from typing import List
 import random
 import time
+import numpy as np
 
 
 @remote(num_gpus=1, num_cpus=1)
@@ -94,8 +95,19 @@ class KConnectFederatedLearning(FederatedNode):
         accuracy = 100 * correct / total
         avg_loss = total_loss / num_batches
         
-        self.model.train()  # Set back to training mode
+        self.model.train()  # Set back to training mode-------------------------------------------------------
         return accuracy, avg_loss
+
+    def distributed_cossines_similarity(self):
+        modlel_A = torch.nn.utils.parameters_to_vector(self.model)
+        norm_a = np.linalg.norm(modlel_A)
+        message_body = {
+            MESSAGE_BODY_NORM : norm_a,
+            'sender_id': self.id,
+            'round': self.local_round_counter
+        }
+        for neighbor_id in self.neighbors:
+            self.send(header=SIMMILARITY_REQUEST, body=message_body, to=neighbor_id)
 
     def calculate_train_accuracy(self):
         train_accuracy, train_loss = self.evaluate_model(self.train_loader)
@@ -175,6 +187,27 @@ class KConnectFederatedLearning(FederatedNode):
                     self.log.info(f'Client {self.id} received model from neighbor {sender_id} ({received_count}/{expected_neighbors})')
                 else:
                     self.log.warn(f'Client {self.id} received model from non-neighbor {sender_id}')
+            if message.header == SIMMILARITY_REQUEST:
+                modlel_B = torch.nn.utils.parameters_to_vector(self.model)
+                norm_b = np.linalg.norm(modlel_B)
+                norm_a = message.body
+                message_body = {
+                    MESSAGE_BODY_NORM : modlel_B/(norm_b*norm_a),
+                    'sender_id': self.id,
+                    'round': self.local_round_counter
+                }
+                for neighbor_id in self.neighbors:
+                    self.send(header=SIMMILARITY_REQUEST_ACCEPT, body=message_body, to=message.sender_id)
+            if message.header == SIMMILARITY_REQUEST:
+                modlel_B = torch.nn.utils.parameters_to_vector(self.model)
+                message_body = {
+                    MESSAGE_BODY_NORM : modlel_B/(norm_b*norm_a),
+                    'sender_id': self.id,
+                    'round': self.local_round_counter
+                }
+                for neighbor_id in self.neighbors:
+                    self.send(header=SIMMILARITY_REQUEST_ACCEPT, body=message_body, to=message.sender_id)
+                        
             else:
                 self.log.warn(f'Client {self.id} received unexpected message: {message.header}')
 
@@ -238,7 +271,7 @@ class KConnectFederatedLearning(FederatedNode):
             
             # Step 9: Aggregate models using DFL formula
             self.aggregate_models()
-            
+
             # Calculate accuracy after aggregation
             post_agg_train_acc, post_agg_train_loss = self.calculate_train_accuracy()
             post_agg_test_acc, post_agg_test_loss = self.calculate_test_accuracy()
