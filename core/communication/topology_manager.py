@@ -6,7 +6,7 @@ from utils.topology_generator import generate_k_connected_graph_from_nodes
 from constants.framework import TOPOLOGY_MANAGER_CPU_RESOURCES
 from constants.topology_constants import *
 from .message import Message
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 from typing import Dict, List, Optional, Union
 from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
 
@@ -55,15 +55,15 @@ class TopologyManager:
                 # Relabel nodes to use actual node_ids instead of 0,1,2...
                 mapping = {i: self._node_ids[i] for i in range(len(self._node_ids))}
                 self._graph = nx.relabel_nodes(self._graph, mapping)
-                
-                nx.draw(self._graph, with_labels=True)
-                plt.show()
+                # TODO: make network it configurable
+                # nx.draw(self._graph, with_labels=True)
+                # plt.show()
             elif self._topology == TOPOLOGY_RING:
                 print(f"the node_ids are {type(self._node_ids)} and the node itself is {type(self._node_ids[0])}")
                 self._topology = nx.cycle_graph(self._node_ids)
                 self._graph = nx.cycle_graph(self._node_ids)
-                nx.draw(self._graph, with_labels=True)
-                plt.show()
+                # nx.draw(self._graph, with_labels=True)
+                # plt.show()
             elif self._topology == TOPOLOGY_CUSTOM:
                 #self._graph = nx.from_numpy_array(np.array(self.adjacency_matrix))
                 '''
