@@ -1,4 +1,4 @@
-device: 'cuda'
+device: 'cpu'
 gpu_index: "0"
 
 random_seed: 42
@@ -6,11 +6,11 @@ random_seed: 42
 federation_id: '1.x.y'
 # RvQ: What is the meaning of CLusteredFederatedLearning?
 # TraditionalFederatedLearning | DecentralizedFederatedLearning | ClusterFederatedLearningSchema
-federated_learning_schema: 'TraditionalFederatedLearning'
+federated_learning_schema: 'DecentralizedFederatedLearning'
 # The network topology of the federated learning: star, k_connect, ring, custom (given an adjacency matrix)
-federated_learning_topology: 'star'
+federated_learning_topology: 'k_connect'
 # For k_connect topology 
-client_k_neighbors: 3
+client_k_neighbors: 1
 
 # train | test | eval | train-test-eval | train-eval | etc.
 client_role: 'train' # RvQ: We got clients that only train or only evaluate?
@@ -50,7 +50,7 @@ test_batch_size: 28
 transform_input_size: 28
 weight_decay: null
 
-number_of_clients: 4
+number_of_clients: 2
 client_sampling_rate: 1.0
 pre_computed_data_driven_clustering: false
 do_cluster: true
