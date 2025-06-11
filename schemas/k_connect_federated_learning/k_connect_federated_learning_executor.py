@@ -8,7 +8,8 @@ import time
 
 from core.federated import FederatedNode
 from decorators.remote import remote
-from schemas.k_connect_federated_learning.k_connect_federated_learning import KConnectFederatedLearning
+from schemas.k_connect_federated_learning.k_connect_federated_learning import \
+    KConnectFederatedLearning
 from schemas.k_connect_federated_learning.k_connect_federated_learning_schema import KConnectFederatedLearningSchema
 
 from validators.config_validator import ConfigValidator
