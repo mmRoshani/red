@@ -163,26 +163,6 @@ class KConnectFederatedLearning(FederatedNode):
                 self.log.warn(f'Client {self.id} timed out waiting for neighbor models')
                 continue
 
-            #Khamideh updates : similarity requests-----------------------
-            if message.header == SIMILARITY_REQUEST:
-                sender_id = message.body.get('sender_id')
-                sender_model_vector = message.body.get('model_vector')
-                if 1 == 1 : # for future attack detect!
-                    similarity = NeighborsCosineSimilarities.request_aprove(self,sender_model_vector,sender_id).item()
-                    similarity_with_sender = {f"{sender_id}, local round {message.body.get("round")}" : f"round:{self.local_round_counter} similarity:{similarity}"}
-                    self.similarity_dict.update(similarity_with_sender)
-
-            elif message.header == SIMILARITY_REQUEST_APROVE:
-                sender_id = message.body.get('sender_id')
-                sender_model_vector = message.body.get('model_vector')
-                similarity = (message.body.get("cosine_similarity")).item()
-                if 1 == 1 : # for future attack detect!
-                    similarity_with_sender = {f"{sender_id}, local round {message.body.get("round")}" : f"round:{self.local_round_counter} similarity:{similarity}"}
-                    self.similarity_dict.update(similarity_with_sender)
-                print(self.similarity_dict)
-
-
-
             if message.header == MODEL_UPDATE:
                 sender_id = message.body.get('sender_id')
                 received_state = message.body[MESSAGE_BODY_STATES]
@@ -241,14 +221,17 @@ class KConnectFederatedLearning(FederatedNode):
             
             train_accuracy, train_loss = self.calculate_train_accuracy()
             test_accuracy, test_loss = self.calculate_test_accuracy()
+
+
+            #Khamideh updates : send model norm to neighbour for similarity
+            NeighborsCosineSimilarities.request(self)
+
+            NeighborsCosineSimilarities.receive_request(self)
     
             self.send_model_to_neighbors()
             
             self.receive_models_from_neighbors()
 
-            #Khamideh updates : send model norm to neighbour for similarity
-            NeighborsCosineSimilarities.request(self)
-            
             self.aggregate_models()
             
             post_agg_train_acc, post_agg_train_loss = self.calculate_train_accuracy()

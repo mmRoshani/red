@@ -38,3 +38,42 @@ class NeighborsCosineSimilarities():
         receiver.send(header=SIMILARITY_REQUEST_APROVE, body=message_body, to=sender_id)
 
         return(cosine_similarity)
+    
+    def receive_request(receiver):
+        receiver.neighbors_models = {}
+        received_count = 0
+        expected_neighbors = len(receiver.neighbors)
+        
+        receiver.log.info(f'Client {receiver.id} waiting to receive models from {expected_neighbors} neighbors')
+        
+        while received_count < expected_neighbors:
+            message = receiver.receive(block=True, timeout=300.0)
+            
+            if message is None:
+                receiver.log.warn(f'Client {receiver.id} timed out waiting for neighbor models')
+                continue
+
+            #Khamideh updates : similarity requests-----------------------
+            elif message.header == SIMILARITY_REQUEST:
+                sender_id = message.body.get('sender_id')
+                sender_model_vector = message.body.get('model_vector')
+
+                if 1 == 1 : # for future attack detect!
+                    similarity = NeighborsCosineSimilarities.request_aprove(receiver,sender_model_vector,sender_id).item()
+                    similarity_with_sender = {f"{sender_id}, local round {message.body.get("round")}" : f"round:{receiver.local_round_counter} similarity:{similarity}"}
+                    receiver.similarity_dict.update(similarity_with_sender)
+
+            elif message.header == SIMILARITY_REQUEST_APROVE:
+
+                sender_id = message.body.get('sender_id')
+                sender_model_vector = message.body.get('model_vector')
+                similarity = (message.body.get("cosine_similarity")).item()
+
+                if 1 == 1 : # for future attack detect!
+                    similarity_with_sender = {f"{sender_id}, local round {message.body.get("round")}" : f"round:{receiver.local_round_counter} similarity:{similarity}"}
+                    receiver.similarity_dict.update(similarity_with_sender)
+                    receiver.log.info(f"Client {receiver.id} similarities : {receiver.similarity_dict}")
+
+                    received_count += 1
+            else:
+                receiver.log.warn(f'Client {receiver.id} received unexpected message: {message.header}')
