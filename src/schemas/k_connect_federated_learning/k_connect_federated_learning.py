@@ -1,22 +1,23 @@
-from src.constants import MODEL_UPDATE, SERVER_ID, MESSAGE_BODY_STATES
-from src.core.communication.message import Message
-from src.core.federated import FederatedNode
-from src.decorators.remote import remote
-from src.nets import network_factory
+from constants.framework import MODEL_UPDATE, SERVER_ID, MESSAGE_BODY_STATES, SIMILARITY_REQUEST, SIMILARITY_REQUEST_APROVE
+from core.communication.message import Message
+from core.federated import FederatedNode
+from decorators.remote import remote
+from nets.network_factory import network_factory
 import copy
 from typing import Dict, List
 import torch
 from torch.nn import Module as NN
-from src.utils.checker import device_checker
-from src.utils.get_last_char_as_int import get_last_char_as_int
-from src.validators.config_validator import ConfigValidator
-from src.utils.log import Log
+from utils.checker import device_checker
+from utils.get_last_char_as_int import get_last_char_as_int
+from validators.config_validator import ConfigValidator
+from utils.log import Log
 
-from src.core.aggregator.fed_avg_aggregator_base import FedAvgAggregator
-from src.utils.client_ids_list import client_ids_list_generator
+from core.aggregator.fed_avg_aggregator_base import FedAvgAggregator
+from utils.client_ids_list import client_ids_list_generator
 from typing import List
 import random
 import time
+from utils.similarities.distributed_cosine_similarities import DistributedCosineSimilarities
 
 
 @remote(num_gpus=1, num_cpus=1)
@@ -34,6 +35,7 @@ class KConnectFederatedLearning(FederatedNode):
         self.aggregator: FedAvgAggregator = None
         self.log = config.RUNTIME_COMFIG.log
         self.device = 'cpu'
+        self.similarity_dict = {}
         
         # DFL specific parameters
         self.local_round_counter = 0
@@ -160,7 +162,7 @@ class KConnectFederatedLearning(FederatedNode):
             if message is None:
                 self.log.warn(f'Client {self.id} timed out waiting for neighbor models')
                 continue
-                
+
             if message.header == MODEL_UPDATE:
                 sender_id = message.body.get('sender_id')
                 received_state = message.body[MESSAGE_BODY_STATES]
@@ -182,38 +184,30 @@ class KConnectFederatedLearning(FederatedNode):
         local_state = self.model.state_dict()
         aggregated_state = {}
         
-        # Calculate denominator: d_i + sum(d_j for j in N)
         total_data_size = self.local_data_size + sum(
             neighbor_info['data_size'] for neighbor_info in self.neighbors_models.values()
         )
         
         self.log.info(f'Client {self.id} aggregating with local data size {self.local_data_size} and total data size {total_data_size}')
         
-        # Initialize aggregated state with weighted local model
         for key in local_state.keys():
-            # Start with weighted local model: d_i * w_i^r
             aggregated_state[key] = (self.local_data_size * local_state[key]).float()
             
-            # Add weighted neighbor models: sum(d_j * w_j^r for j in N)
             for neighbor_id, neighbor_info in self.neighbors_models.items():
                 neighbor_state = neighbor_info['state_dict']
                 neighbor_data_size = neighbor_info['data_size']
                 aggregated_state[key] += (neighbor_data_size * neighbor_state[key]).float()
             
-            # Divide by total data size
             aggregated_state[key] = aggregated_state[key] / total_data_size
         
-        # Load aggregated model
         self.model.load_state_dict(aggregated_state)
-        self.model = self.model.to(self.device)  # Move back to device
+        self.model = self.model.to(self.device)  
         
         self.log.info(f'Client {self.id} completed model aggregation for round {self.local_round_counter + 1}')
 
     def run_dfl_rounds(self):
-        # Ensure neighbors are properly selected
         self.select_neighbors()
         
-        # Calculate initial accuracy before training
         self.log.info(f"================= Client {self.id} - Initial Evaluation =================")
         initial_train_acc, initial_train_loss = self.calculate_train_accuracy()
         initial_test_acc, initial_test_loss = self.calculate_test_accuracy()
@@ -223,23 +217,22 @@ class KConnectFederatedLearning(FederatedNode):
             
             self.log.info(f"================= Client {self.id} - DFL Round {round_num + 1}/{self.federated_learning_rounds} =================")
             
-            # Step 4: Train local model w_i^r on local data
             self.local_training_round()
             
-            # Calculate accuracy after local training
             train_accuracy, train_loss = self.calculate_train_accuracy()
             test_accuracy, test_loss = self.calculate_test_accuracy()
-            
-            # Step 6: Send w_i^r to each neighbor j in N
+
+            for neighbor_id in self.neighbors:
+                DistributedCosineSimilarities.request(self, neighbor_id)
+
+            DistributedCosineSimilarities.receive_request(self)
+    
             self.send_model_to_neighbors()
-            
-            # Step 7: Receive w_j^r from each neighbor j
+
             self.receive_models_from_neighbors()
-            
-            # Step 9: Aggregate models using DFL formula
+
             self.aggregate_models()
             
-            # Calculate accuracy after aggregation
             post_agg_train_acc, post_agg_train_loss = self.calculate_train_accuracy()
             post_agg_test_acc, post_agg_test_loss = self.calculate_test_accuracy()
             
@@ -266,9 +259,9 @@ class KConnectFederatedLearning(FederatedNode):
             raise ValueError(f"Unknown phase: {phase}")
 
     def train(self, optimizer_fn, loss_fn):
-        # Initialize components
+
         self.build()
-        # Setup optimizer and loss function
+
         self.optimizer = optimizer_fn(self.model.parameters(), lr=self.config.LEARNING_RATE)
         self.criterion = loss_fn()
         

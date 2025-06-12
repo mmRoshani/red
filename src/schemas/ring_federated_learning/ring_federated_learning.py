@@ -1,19 +1,21 @@
-from src.constants import MODEL_UPDATE, SERVER_ID, MESSAGE_BODY_STATES
-from src.core.communication.message import Message
-from src.core.federated import FederatedNode
-from src.decorators.remote import remote
-from src.nets import network_factory
+from constants.framework import MODEL_UPDATE, SERVER_ID, MESSAGE_BODY_STATES
+from core.communication.message import Message
+from core.federated import FederatedNode
+from decorators.remote import remote
+from nets.network_factory import network_factory
 import copy
 from typing import Dict
 import torch
 from torch.nn import Module as NN
-from src.utils.checker import device_checker
-from src.utils.get_last_char_as_int import get_last_char_as_int
-from src.validators.config_validator import ConfigValidator
-from src.utils.log import Log
+from utils.checker import device_checker
+from utils.get_last_char_as_int import get_last_char_as_int
+import utils.similarities.pairwise_cosine_similarity
+from validators.config_validator import ConfigValidator
+from utils.log import Log
 
-from src.core.aggregator.fed_avg_aggregator_base import FedAvgAggregator
-from src.utils.client_ids_list import client_ids_list_generator
+from core.aggregator.fed_avg_aggregator_base import FedAvgAggregator
+from utils.client_ids_list import client_ids_list_generator
+from utils.similarities.pairwise_cosine_similarity import pairwise_cosine_similarity
 from typing import List
 import random
 import time
@@ -34,16 +36,16 @@ class RingFederatedLearning(FederatedNode):
         self.test_loader = None
         self.aggregator: FedAvgAggregator = None
         self.log = config.RUNTIME_COMFIG.log
-        self.device = 'cpu'
+        self.device = None
         
-        # RDFL specific parameters
-        self.synchronizing_interval = config.CLUSTERING_PERIOD  # K in the algorithm
+        self.synchronizing_interval = config.CLUSTERING_PERIOD  
         self.local_round_counter = 0
         self.global_round_counter = 0
-        self.is_ring_initiator = False  # Only client_0 starts the ring process
+        self.is_ring_initiator = False  
+
+        distributed_hash_table = True #-------------------------#
 
     def build(self):
-        """Initialize peer components"""
         self.device = device_checker(self.config.DEVICE)
         self.federated_learning_rounds = self.config.FEDERATED_LEARNING_ROUNDS
         self.local_epochs = self.config.NUMBER_OF_EPOCHS
@@ -55,17 +57,14 @@ class RingFederatedLearning(FederatedNode):
 
         self.aggregator = FedAvgAggregator(config=self.config, log=self.log)
 
-        # Initialize local dataset
         self.train_loader = self.config.RUNTIME_COMFIG.train_loaders[get_last_char_as_int(self.id)]
         self.test_loader = self.config.RUNTIME_COMFIG.test_loaders[get_last_char_as_int(self.id)]
         
-        # Determine if this node is the ring initiator (client_0)
         self.is_ring_initiator = self.id == 'client_0'
         
         self.log.info(f'Client {self.id} initialized local model (Ring Initiator: {self.is_ring_initiator})')
 
     def local_training_round(self):
-        # Local training for specified epochs
         for epoch in range(self.local_epochs):
             epoch_loss = 0.0
             num_batches = 0
@@ -84,9 +83,10 @@ class RingFederatedLearning(FederatedNode):
                 
                 if batch_idx % 50 == 0:
                     self.log.info(f'Client {self.id}, - Epoch {epoch + 1}/{self.local_epochs}, Batch {batch_idx}, Loss: {loss.item():.6f}')
-            
+            print(self.simsim())
             avg_epoch_loss = epoch_loss / num_batches
             self.log.info(f'Client {self.id}, - Epoch {epoch + 1}/{self.local_epochs} completed with avg loss: {avg_epoch_loss:.6f}')
+
 
         self.log.info(f'Client {self.id} completed local training.')
 
@@ -98,6 +98,7 @@ class RingFederatedLearning(FederatedNode):
             'sender_id': self.id,
             'ring_position': get_last_char_as_int(self.id)
         }
+        
         self.log.info(f"Client {self.id} sending trained model to next node in ring: {next_node}")
         self.send(header=MODEL_UPDATE, body=message_body, to=next_node)
 

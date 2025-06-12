@@ -8,8 +8,43 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--directory', type=str, required=True, help='Input base directory containing class subdirectories')
     parser.add_argument('--output', type=str, required=True, help='Relative path for output client directories')
+    parser.add_argument('--input2', type=str, help='Second input base directory (for balanced splitting)')
+    parser.add_argument('--output2', type=str, help='Output directory for second input splitting')
     parser.add_argument('--max', type=int, default=10, help='Maximum samples per class')
     return parser.parse_args()
+
+def balanced_split_all_classes(input_dir2, output_dir2, labels, num_clients):
+    print(f"\nPerforming balanced split of second dataset into {num_clients} clients...")
+    os.makedirs(output_dir2, exist_ok=True)
+
+    for i in range(1, num_clients + 1):
+        for label in labels:
+            os.makedirs(os.path.join(output_dir2, f'client_{i}', label), exist_ok=True)
+
+    for label in labels:
+        class_dir = os.path.join(input_dir2, label)
+        txt_files = [f for f in os.listdir(class_dir) if os.path.isfile(os.path.join(class_dir, f)) and f.lower().endswith('.txt')]
+
+        if not txt_files:
+            print(f"No .txt files found in class '{label}', skipping.")
+            continue
+
+        random.shuffle(txt_files)
+        total = len(txt_files)
+        base_count = total // num_clients
+        remainder = total % num_clients
+
+        start = 0
+        for i in range(num_clients):
+            count = base_count + (1 if i < remainder else 0)
+            client_dir = os.path.join(output_dir2, f'client_{i+1}', label)
+            selected = txt_files[start:start+count]
+            for fname in selected:
+                shutil.copy2(os.path.join(class_dir, fname), os.path.join(client_dir, fname))
+            print(f"Copied {len(selected)} '{label}' files to client_{i+1}/{label}")
+            start += count
+
+    print("Second balanced splitting complete.")
 
 def main():
     seed = 42
@@ -49,13 +84,11 @@ def main():
     for i, (a, b) in enumerate(assignments, 1):
         print(f" Client #{i}: {idx_to_label[a]} & {idx_to_label[b]}")
 
-    # Build class -> client index list
     class_map = {idx: [] for idx in range(num_labels)}
     for client_idx, (a, b) in enumerate(assignments, 1):
         class_map[a].append(client_idx)
         class_map[b].append(client_idx)
 
-    # 🔧 PRE-CREATE all client subdirectories with all labels
     print("\nCreating client directories and label subfolders...")
     for client_idx in range(1, len(assignments)+1):
         client_dir = os.path.join(output_base, f"client_{client_idx}")
@@ -106,7 +139,15 @@ def main():
 
             print(f"Copied {len(selected)} files of '{label}' to client_{client_idx}/{label}/")
 
-    print("\n✅ Data splitting complete.")
+    num_clients = len(assignments)
+    if args.input2 and args.output2:
+        input2_dir = os.path.abspath(args.input2)
+        output2_dir = os.path.abspath(args.output2)
+
+        balanced_split_all_classes(input2_dir, output2_dir, labels, num_clients)
+
+
+    print("\nData splitting complete.")
 
 if __name__ == "__main__":
     main()

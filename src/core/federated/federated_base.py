@@ -1,45 +1,13 @@
 from src.core.communication.topology_manager import TopologyManager
 from src.core.federated.virtual_node import VirtualNode
-from src.utils.checker import device_checker
-from src.utils.log import Log
 import numpy as np
 import ray
 from ray.util.placement_group import PlacementGroup
 import threading
 from typing import Dict, List, Literal, Optional, Union
 from src.core.communication.message import Message
-from src.utils.resources import get_resources_split
+from src.core.management import get_resources_split
 from src.validators.config_validator import ConfigValidator
-
-
-# def __init__(
-#         self,
-#         model,
-#         config: 'ConfigValidator', log: 'Log'):
-#     self.log = log
-#     self.config = config
-#     self.device = device_checker(self.config.DEVICE)
-#     self.model = model.to(self.device)
-#
-#
-# def evaluate(self):
-#     _loss, _accuracy = model_evaluation(self.model, self.eval_loader)
-#
-#     if _loss < 1.0 and _accuracy > 0.6:
-#         self.log.info(
-#             f"testing done for client no {self.id} with accuracy of {_accuracy} and loss of {_loss} [GOOD]"
-#         )
-#     elif _loss < 2.0 and _accuracy > 0.4:
-#         self.log.warn(
-#             f"testing done for client no {self.id} with accuracy of {_accuracy} and loss of {_loss} [MODERATE]"
-#         )
-#     else:
-#         self.log.warn(
-#             f"testing done for client no {self.id} with accuracy of {_accuracy} and loss of {_loss} [POOR]"
-#         )
-#
-#     return _accuracy
-
 
 
 class FederatedBase(object):

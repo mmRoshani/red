@@ -1,11 +1,11 @@
 import random
 import logging
+from typing import Literal, Union
+import ray
+from ray.util.placement_group import placement_group
+from ray import tune
 
 from src.constants import SAFETY_EPSILON
-from src.utils.log import Log
-import ray
-from typing import Literal
-
 
 def get_resources_split(
     num_nodes: int,

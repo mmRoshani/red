@@ -1,7 +1,4 @@
-import os
-from src.core.clustering.data_driven import calculate_label_distribution
-from src.datasets import determine_dataset_type
-from src.schemas import schema_factory
+from src import determine_dataset_type, schema_factory
 from src.utils import client_ids_list_generator
 from src.utils.framework_setup import FrameworkSetup
 from src.utils.log import Log
@@ -20,7 +17,7 @@ def main(config_yaml_path: str = "./config.yaml"):
 
     config_dict = load_objectified_yaml(config_yaml_path)
 
-    config_dict = config_dict | {'desired_distribution': None} # TODO: update
+    config_dict = config_dict | {"desired_distribution": None}  # TODO: update
 
     config = ConfigValidator(**config_dict)
 
@@ -67,5 +64,4 @@ def main(config_yaml_path: str = "./config.yaml"):
     schema_runner_fn(config, log)
 
 if __name__ == "__main__":
-    #typer.run(main)
     main()
