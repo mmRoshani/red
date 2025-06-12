@@ -21,7 +21,7 @@ transformer_model_size: "base"
 pretrained_models: false
 dataset_type: "fmnist"
 loss_function: "CrossEntropy"
-optimizer: "adam"
+optimizer: "adam" 
 
 data_distribution_kind: "30"
 desired_distribution: null
