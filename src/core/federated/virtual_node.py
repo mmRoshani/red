@@ -19,7 +19,7 @@ class VirtualNode(object):
 
     def __init__(
         self,
-        template: Type[object], # FederatedBase
+        template: Type[object],
         id: str,
         role: str,
         config: 'ConfigValidator',
@@ -39,7 +39,7 @@ class VirtualNode(object):
         self.role = role
         self.config = config
         self.log = log
-        self.handle: object = None # FederatedBase
+        self.handle: object = None
 
     def build(self, bundle_idx: int, placement_group: PlacementGroup):
         """Builds the node.

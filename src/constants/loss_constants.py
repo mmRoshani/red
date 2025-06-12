@@ -1,0 +1,3 @@
+LOSS_CROSS_ENTROPY= "CrossEntropy"
+LOSS_MASKED_CROSS_ENTROPY = "MaskedCrossEntropy"
+LOSS_SMOOTHED_CROSS_ENTROPY = "SmoothCrossEntropy"

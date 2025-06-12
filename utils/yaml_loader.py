@@ -3,7 +3,7 @@ import yaml
 from collections import namedtuple
 from typing import Dict, Any
 from pathlib import Path
-from src.constants.models_constants import TRANSFORMER_MODEL_SIZE_BASE
+from src.constants import TRANSFORMER_MODEL_SIZE_BASE
 from src.constants.loss_constants import LOSS_CROSS_ENTROPY, LOSS_MASKED_CROSS_ENTROPY, LOSS_SMOOTHED_CROSS_ENTROPY
 from src.constants.optimizer_constants import OPTIMIZER_ADAM
 

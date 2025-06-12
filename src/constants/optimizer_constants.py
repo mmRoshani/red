@@ -1,0 +1,4 @@
+OPTIMIZER_ADAM = "adam"
+OPTIMIZER_ADAM_W = "adamw"
+OPTIMIZER_SGD = "sgd"
+OPTIMIZER_DSGD = "dsgd"

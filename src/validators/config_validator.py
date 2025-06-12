@@ -3,48 +3,96 @@ from typing import Tuple, List
 
 from torch.utils.data import DataLoader
 
-from src.constants import TRAIN, TEST, EVAL, TRAIN_TEST, TRAIN_EVAL, TEST_EVAL, TRAIN_TEST_EVAL
+from src.constants.client_roles_constants import (
+    TRAIN, 
+    TEST, 
+    EVAL, 
+    TRAIN_TEST, 
+    TRAIN_EVAL, 
+    TEST_EVAL, 
+    TRAIN_TEST_EVAL
+    )
 
-from src.constants import (
+from src.constants.loss_constants import (
+    LOSS_MASKED_CROSS_ENTROPY, 
+    LOSS_CROSS_ENTROPY, 
+    LOSS_SMOOTHED_CROSS_ENTROPY
+    )
+from src.validators.validator_exporters import (
+    transformer_model_size_exporter, 
+    optimizer_constans_exporter
+)
+from src.constants.distances_constants import (
     DISTANCE_COORDINATE,
     DISTANCE_COSINE,
     DISTANCE_EUCLIDEAN,
 )
-from src.constants import TRADITIONAL_FEDERATED_LEARNING, CLUSTER_FEDERATED_LEARNING, \
+from src.constants.schema_constants import (
+    TRADITIONAL_FEDERATED_LEARNING, 
+    CLUSTER_FEDERATED_LEARNING,
     DECENTRALIZED_FEDERATED_LEARNING
+    )
 
-from src.constants.topology_constants import  TOPOLOGY_STAR, TOPOLOGY_RING, TOPOLOGY_K_CONNECT, TOPOLOGY_CUSTOM
-
-from src.constants import (
+from src.constants.topology_constants import  (
+    TOPOLOGY_STAR, 
+    TOPOLOGY_RING, 
+    TOPOLOGY_K_CONNECT, 
+    TOPOLOGY_CUSTOM
+)
+from src.constants.models_constants import (
     MODEL_CNN,
     MODEL_RESNET_18,
     MODEL_RESNET_50,
     MODEL_MOBILENET,
     MODEL_VGG,
     MODEL_VIT,
-    MODEL_SWIN, MODEL_LENET
+    MODEL_SWIN, 
+    MODEL_LENET,
+    MODEL_BERT,
+    MODEL_ALBERT,
+    TRANSFORMER_MODEL_SIZE_LARGE,
+    TRANSFORMER_MODEL_SIZE_BASE,
 )
 
-from src.constants import (
+from src.constants.aggregation_strategy_constants import (
     AGGREGATION_STRATEGY_FED_AVG,
     AGGREGATION_STRATEGY_FED_PROX,
 )
 
 from src.constants.datasets_constants import (
-    DATA_SET_STL_10,
+    DATA_SET_MNIST,
+    DATA_SET_FMNIST,
+    DATA_SET_FEMNIST,
     DATA_SET_CIFAR_10,
     DATA_SET_CIFAR_100,
-    DATA_SET_FMNIST,
     DATA_SET_SVHN,
-    DATA_SET_TINY_IMAGE_NET
+    DATA_SET_STL_10,
+    DATA_SET_TINY_IMAGE_NET,
+    DATA_SET_SHAKESPEARE,
+    DATA_SET_BBC,
+    DATA_SET_YAHOO,
+    DATA_SET_NEWS,
+    SHAKESPEARE_RAW_DATA_PATH,
+    SHAKESPEARE_TARGET_PATH,
 )
 
-from src.constants import (
+from src.constants.data_distribution_constants import (
+    DATA_DISTRIBUTION_FIX,
+    DATA_DISTRIBUTION_IID,
+    DATA_DISTRIBUTION_IID_DIFF_QUANTITY,
+    DATA_DISTRIBUTION_N_10,
     DATA_DISTRIBUTION_N_20,
     DATA_DISTRIBUTION_N_30,
+    DATA_DISTRIBUTION_N_40,
+    DATA_DISTRIBUTION_N_50,
+    DATA_DISTRIBUTION_N_60,
+    DATA_DISTRIBUTION_N_70,
+    DATA_DISTRIBUTION_N_80,
+    DATA_DISTRIBUTION_N_90,
     DATA_DISTRIBUTION_DIR,
-    DATA_DISTRIBUTION_FIX,
+    DATA_DISTRIBUTION_REAL_FEMNIST
 )
+
 from src.utils.gpu_index_list import list_available_gpus
 from src.utils.log import Log
 from src.validators.runtime_config import RuntimeConfig
@@ -55,7 +103,10 @@ class ConfigValidator:
             self,
             learning_rate: float,
             model_type: str,
+            transformer_model_size: str,
             dataset_type: str,
+            loss_function: str,
+            optimizer: str,
             data_distribution_kind: str,
             distance_metric: str,
             number_of_epochs=None,
@@ -76,33 +127,47 @@ class ConfigValidator:
             remove_common_ids: bool = False,
             gpu_index: int | None = None,
             device: str = None,
+            random_seed: int = 42,
             fed_avg: bool = False,
+            chunking: bool = False,
+            chunking_with_gradients: bool = False,
+            chunking_parts: float = 5.0,
+            chunking_random_section: bool = False,
             stop_avg_accuracy=None,
             pre_computed_data_driven_clustering: bool = False,
             distance_metric_on_parameters: bool = True,
             pretrained_models: bool = False,
             federated_learning_schema: str = None,
             federated_learning_topology: str = None,
+            adjacency_matrix: List = None,
             client_k_neighbors: int = None,
             client_role: str = None,
             client_sampling_rate: float = 1.0,
             aggregation_strategy: str = None,
             aggregation_sample_scaling: bool = False,
+            mean_accuracy_to_csv: bool = True,
             federation_id: str = "",
+            encryption_method: str = None,
+            xmkckks_weight_decimals: int = None,
+            use_global_accuracy_for_noniid: bool = True,
 
     ):
 
         self._RUNTIME_COMFIG: RuntimeConfig | None = None
 
+        self.RANDOM_SEED = random_seed
+
         self.LEARNING_RATE = learning_rate
         self.MODEL_TYPE = self._validate_model_type(model_type)
+        self.TRANSFORMER_MODEL_SIZE = self._transformer_model_size(transformer_model_size)
         self.DATASET_TYPE = self._validate_dataset_type(dataset_type)
+        self.LOSS_FUNCTION = self._validate_loss_function(loss_function)
+        self.OPTIMIZER = self._validate_optimizer(optimizer)
         self.DATA_DISTRIBUTION = self._validate_data_distribution(data_distribution_kind, desired_distribution)
         self.DISTANCE_METRIC = self._set_distance_metric(distance_metric)
         self.NUMBER_OF_EPOCHS = self._set_number_of_epochs(number_of_epochs)
         self.DYNAMIC_SENSITIVITY_PERCENTAGE = dynamic_sensitivity_percentage
-        self.SENSITIVITY_PERCENTAGE = self._set_sensitivity_percentage(sensitivity_percentage,
-                                                                       dynamic_sensitivity_percentage)
+        self.SENSITIVITY_PERCENTAGE = self._set_sensitivity_percentage(sensitivity_percentage, dynamic_sensitivity_percentage)
 
         self.TRAIN_BATCH_SIZE, self.TEST_BATCH_SIZE, self.TRANSFORM_INPUT_SIZE = (
             self._set_transformer(
@@ -125,7 +190,13 @@ class ConfigValidator:
         self.REMOVE_COMMON_IDS = remove_common_ids
         self.GPU_INDEX = gpu_index
         self.DEVICE = self._device(device, gpu_index)
+        self.MULTI_GPU = self._is_multi_gpu(gpu_index)
+        self.GPU_DEVICE_IDS = self._parse_gpu_indices(gpu_index)
         self.FED_AVG = fed_avg
+        self.CHUNKING_WITH_GRADIENTS = chunking_with_gradients
+        self.CHUNKING_PARTS = chunking_parts
+        self.CHUNKING_RANDOM_SECTION = chunking_random_section
+        self.CHUNKING = self._validata_chunking(chunking)
         self.STOP_AVG_ACCURACY = self._stop_avg_accuracy(stop_avg_accuracy)
         self.PRE_COMPUTED_DATA_DRIVEN_CLUSTERING = pre_computed_data_driven_clustering
         self.DISTANCE_METRIC_ON_PARAMETERS = distance_metric_on_parameters
@@ -138,44 +209,8 @@ class ConfigValidator:
         self.AGGREGATION_STRATEGY = self._aggregation_strategy(aggregation_strategy)
         self.AGGREGATION_SAMPLE_SCALING = aggregation_sample_scaling
         self.FEDERATION_ID = federation_id
-
-    # def items(self):
-    #
-    # TODO: sync with class filed items
-    #
-    #     config_dic = {
-    #         "MODEL_TYPE": self.MODEL_TYPE,
-    #         "DATASET_TYPE": self.DATASET_TYPE,
-    #         "NUMBER_OF_CLASSES": self.NUMBER_OF_CLASSES,
-    #         "DATA_DISTRIBUTION": self.DATA_DISTRIBUTION,
-    #         "ROUND_EPOCHS": self.NUMBER_OF_EPOCHS,
-    #         "SENSITIVITY_PERCENTAGE": self.SENSITIVITY_PERCENTAGE,
-    #         "DYNAMIC_SENSITIVITY_PERCENTAGE": self.DYNAMIC_SENSITIVITY_PERCENTAGE,
-    #         "TRAIN_BATCH_SIZE": self.TRAIN_BATCH_SIZE,
-    #         "TEST_BATCH_SIZE": self.TEST_BATCH_SIZE,
-    #         "TRANSFORM_INPUT_SIZE": self.TRANSFORM_INPUT_SIZE,
-    #         "LEARNING_RATE": 0.0001 if self.MODEL_TYPE == MODEL_VGG else 0.001,
-    #         "WEIGHT_DECAY": self.WEIGHT_DECAY,
-    #         "NUMBER_OF_CLIENTS": self.NUMBER_OF_CLIENTS,
-    #         "DIRICHLET_BETA": self.DIRICHLET_BETA,
-    #         "DESIRED_DISTRIBUTION": self.DESIRED_DISTRIBUTION,
-    #         "SAVE_BEFORE_AGGREGATION_MODELS": self.SAVE_BEFORE_AGGREGATION_MODELS,
-    #         "SAVE_GLOBAL_MODELS": self.SAVE_GLOBAL_MODELS,
-    #         "DO_CLUSTER": self.DO_CLUSTER,
-    #         "CLUSTERING_PERIOD": self.CLUSTERING_PERIOD,
-    #         "FEDERATED_LEARNING_ROUNDS": self.FEDERATED_LEARNING_ROUNDS,
-    #         "DISTANCE_METRIC": self.DISTANCE_METRIC,
-    #         "GPU_INDEX": self.DISTANCE_METRIC,
-    #         "DEVICE": self.DISTANCE_METRIC,
-    #         "STOP_AVG_ACCURACY": self.DISTANCE_METRIC,
-    #         "REMOVE_COMMON_IDS": self.REMOVE_COMMON_IDS,
-    #         "FED_AVG": self.FED_AVG,
-    #         "PRE_COMPUTED_DATA_DRIVEN_CLUSTERING": self.PRE_COMPUTED_DATA_DRIVEN_CLUSTERING,
-    #         "DISTANCE_METRIC_ON_PARAMETERS": self.DISTANCE_METRIC_ON_PARAMETERS,
-    #         self.PRETRAINED
-    #     }
-    #
-    #     return config_dic
+        self.MEAN_ACCURACY_TO_CSV = mean_accuracy_to_csv
+        self.USE_GLOBAL_ACCURACY_FOR_NONIID = use_global_accuracy_for_noniid
 
     @property
     def RUNTIME_COMFIG(self) -> RuntimeConfig:
@@ -188,45 +223,93 @@ class ConfigValidator:
     def _validate_model_type(self, model_type: str) -> str:
         if model_type not in [
             MODEL_CNN,
-            MODEL_LENET,
             MODEL_RESNET_18,
             MODEL_RESNET_50,
             MODEL_MOBILENET,
             MODEL_VGG,
             MODEL_VIT,
-            MODEL_SWIN,
+            MODEL_SWIN, 
+            MODEL_LENET,
+            MODEL_BERT,
+            MODEL_ALBERT,
+            TRANSFORMER_MODEL_SIZE_LARGE,
+            TRANSFORMER_MODEL_SIZE_BASE,
         ]:
             raise TypeError(f"unsupported model type, {model_type}")
 
         return model_type
+    
+    def _transformer_model_size(self, transformer_model_size):
+        if transformer_model_size in transformer_model_size_exporter():
+            return transformer_model_size
+        else :
+            raise TypeError (f"{transformer_model_size} is not valid transformer model size")
+
 
     def _validate_dataset_type(self, dataset_type: str) -> str:
         if dataset_type not in [
-            DATA_SET_STL_10,
+            DATA_SET_MNIST,
+            DATA_SET_FMNIST,
+            DATA_SET_FEMNIST,
             DATA_SET_CIFAR_10,
             DATA_SET_CIFAR_100,
-            DATA_SET_FMNIST,
             DATA_SET_SVHN,
-            DATA_SET_TINY_IMAGE_NET
+            DATA_SET_STL_10,
+            DATA_SET_TINY_IMAGE_NET,
+            DATA_SET_SHAKESPEARE,
+            DATA_SET_BBC,
+            DATA_SET_YAHOO,
+            DATA_SET_NEWS,
+            SHAKESPEARE_RAW_DATA_PATH,
+            SHAKESPEARE_TARGET_PATH,
         ]:
             raise TypeError(f"unsupported dataset type, {dataset_type}")
 
         return dataset_type
 
+    def _validate_loss_function(self, loss_function: str) -> str:
+        if loss_function not in [
+            LOSS_CROSS_ENTROPY,
+            LOSS_MASKED_CROSS_ENTROPY,
+            LOSS_SMOOTHED_CROSS_ENTROPY,
+        ]:
+            raise TypeError(f"unsupported loss_function, {loss_function}")
+
+        return loss_function
+
+    def _validate_optimizer(self, optimizer):
+        if optimizer not in optimizer_constans_exporter():
+            raise TypeError(f"unsupported optimizer, {optimizer}")
+        return optimizer
+    
     def _dataset_number_of_classes(self, dataset_type: str) -> int:
         if dataset_type == DATA_SET_CIFAR_100:
             return 100
         elif dataset_type == DATA_SET_TINY_IMAGE_NET:
             return 200
+        elif dataset_type == DATA_SET_BBC:
+            return 5
         else:
             return 10
 
-    def _validate_data_distribution(self, data_distribution_kind: str, desired_distribution: str) -> str:
+    def _validate_data_distribution(
+        self, data_distribution_kind: str, desired_distribution: str
+    ) -> str:
         if data_distribution_kind == DATA_DISTRIBUTION_FIX:
             if desired_distribution is None:
-                raise TypeError(f"desired_distribution is None while the data_distribution_kind is fix")
+                raise TypeError(
+                    f"desired_distribution is None while the data_distribution_kind is fix"
+                )
 
             return "noniid-fix"
+
+        elif data_distribution_kind == DATA_DISTRIBUTION_N_10:
+            if self.DATASET_TYPE == DATA_SET_CIFAR_100:
+                return "noniid-#label10"
+            elif self.DATASET_TYPE == DATA_SET_TINY_IMAGE_NET:
+                return "noniid-#label20"
+            else:
+                return "noniid-#label1"
 
         elif data_distribution_kind == DATA_DISTRIBUTION_N_20:
             if self.DATASET_TYPE == DATA_SET_CIFAR_100:
@@ -243,10 +326,69 @@ class ConfigValidator:
                 return "noniid-#label60"
             else:
                 return "noniid-#label3"
+
+        elif data_distribution_kind == DATA_DISTRIBUTION_N_40:
+            if self.DATASET_TYPE == DATA_SET_CIFAR_100:
+                return "noniid-#label40"
+            elif self.DATASET_TYPE == DATA_SET_TINY_IMAGE_NET:
+                return "noniid-#label80"
+            else:
+                return "noniid-#label4"
+
+        elif data_distribution_kind == DATA_DISTRIBUTION_N_50:
+            if self.DATASET_TYPE == DATA_SET_CIFAR_100:
+                return "noniid-#label50"
+            elif self.DATASET_TYPE == DATA_SET_TINY_IMAGE_NET:
+                return "noniid-#label100"
+            else:
+                return "noniid-#label5"
+
+        elif data_distribution_kind == DATA_DISTRIBUTION_N_60:
+            if self.DATASET_TYPE == DATA_SET_CIFAR_100:
+                return "noniid-#label60"
+            elif self.DATASET_TYPE == DATA_SET_TINY_IMAGE_NET:
+                return "noniid-#label120"
+            else:
+                return "noniid-#label6"
+
+        elif data_distribution_kind == DATA_DISTRIBUTION_N_70:
+            if self.DATASET_TYPE == DATA_SET_CIFAR_100:
+                return "noniid-#label70"
+            elif self.DATASET_TYPE == DATA_SET_TINY_IMAGE_NET:
+                return "noniid-#label140"
+            else:
+                return "noniid-#label7"
+
+        elif data_distribution_kind == DATA_DISTRIBUTION_N_80:
+            if self.DATASET_TYPE == DATA_SET_CIFAR_100:
+                return "noniid-#label80"
+            elif self.DATASET_TYPE == DATA_SET_TINY_IMAGE_NET:
+                return "noniid-#label160"
+            else:
+                return "noniid-#label8"
+
+        elif data_distribution_kind == DATA_DISTRIBUTION_N_90:
+            if self.DATASET_TYPE == DATA_SET_CIFAR_100:
+                return "noniid-#label90"
+            elif self.DATASET_TYPE == DATA_SET_TINY_IMAGE_NET:
+                return "noniid-#label180"
+            else:
+                return "noniid-#label9"
+
         elif data_distribution_kind == DATA_DISTRIBUTION_DIR:
             return "noniid-labeldir"
+        elif data_distribution_kind == DATA_DISTRIBUTION_IID:
+            return "homo"
+        elif data_distribution_kind == DATA_DISTRIBUTION_IID_DIFF_QUANTITY:
+            return "iid-diff-quantity"
+        elif data_distribution_kind == DATA_DISTRIBUTION_REAL_FEMNIST:
+            if self.DATASET_TYPE != DATA_SET_FEMNIST:
+                raise TypeError(f"expected femnist dataset but got: {data_distribution_kind}")
+            return "real"
         else:
-            raise TypeError(f"unsupported data distribution data distribution of, {data_distribution_kind}")
+            raise TypeError(
+                f"unsupported data distribution data distribution of, {data_distribution_kind}"
+            )
 
     def _set_distance_metric(self, metric: str) -> str:
         if metric not in [
@@ -288,12 +430,11 @@ class ConfigValidator:
 
     def _set_transformer(
             self,
-            train_batch_size: int | None,  # Use modern union type hint (Python 3.10+) or Optional[int]
+            train_batch_size: int | None,  
             test_batch_size: int | None,
             transform_input_size: int | None,
-    ) -> Tuple[int, int, int]:  # Correct type hint syntax
+    ) -> Tuple[int, int, int]:
 
-        # If user provided all values, use them directly
         if (
                 train_batch_size is not None
                 and test_batch_size is not None
@@ -351,27 +492,46 @@ class ConfigValidator:
         if device == "cpu":
             return device
 
-        if gpu_index is not None:
-            device = torch.device(f"cuda:{gpu_index}")
+        available_gpus = list_available_gpus()
+        
+        if not available_gpus:
+            raise Exception(
+                f"Given device is {device} while there is no GPU available!"
+            )
 
-        gpus = list_available_gpus()
-
-        if gpus:
+        if self._is_multi_gpu(gpu_index):
+            gpu_indices = self._parse_gpu_indices(gpu_index)
+            print(f"Multi-GPU setup requested with GPUs: {gpu_indices}")
+            
             print("Available GPUs:")
-            if device.type == 'cuda' and device.index is None:
-                allocated_index = 0
-            else:
-                allocated_index = device.index
-
-            for index, name in gpus:
-                if device.type == 'cuda' and index == allocated_index:
+            for index, name in available_gpus:
+                if index in gpu_indices:
                     print(f"Index: {index}, Device: {name} (ALLOCATED)")
                 else:
                     print(f"Index: {index}, Device: {name} (UNALLOCATED)")
-        else:
-            raise Exception(f"given device is {device} while there is no gpu available!")
+            
+            primary_device = f"cuda:{gpu_indices[0]}"
+            return primary_device
 
-        return device
+        if gpu_index is not None:
+            single_gpu_indices = self._parse_gpu_indices(gpu_index)
+            if single_gpu_indices:
+                allocated_index = single_gpu_indices[0]
+                device = torch.device(f"cuda:{allocated_index}")
+            else:
+                raise Exception(f"GPU index {gpu_index} is not available!")
+        else:
+            allocated_index = available_gpus[0][0]
+            device = torch.device(f"cuda:{allocated_index}")
+
+        print("Available GPUs:")
+        for index, name in available_gpus:
+            if index == allocated_index:
+                print(f"Index: {index}, Device: {name} (ALLOCATED)")
+            else:
+                print(f"Index: {index}, Device: {name} (UNALLOCATED)")
+
+        return str(device)
 
     def _stop_avg_accuracy(self, stop_avg_accuracy):
         if stop_avg_accuracy is None:
@@ -417,7 +577,7 @@ class ConfigValidator:
     
     def _validate_client_k_neighbors(self, number_of_clients: int, federated_learning_topology: str, client_k_neighbors: int):
         if federated_learning_topology == 'k_connect' and client_k_neighbors is not None:
-            if number_of_clients > client_k_neighbors > 1: 
+            if number_of_clients > client_k_neighbors >= 1: 
                 return client_k_neighbors
             else: 
                 raise TypeError(f"number_of_clients must be greater than client_k_neighbors and client_k_neighbors must be greater than 1"
@@ -427,3 +587,58 @@ class ConfigValidator:
         else:
             return None
         
+    def _validata_chunking(self, chunking: bool) -> bool:
+        if chunking and self.SENSITIVITY_PERCENTAGE == 100 and self.DYNAMIC_SENSITIVITY_PERCENTAGE:
+            warnings.warn(f"got value sensitivity_percentage: {self.SENSITIVITY_PERCENTAGE} and dynamic_sensitivity_percentage: {self.DYNAMIC_SENSITIVITY_PERCENTAGE}"
+                          f"which results in calculating optimal pruning rate!")
+        
+        if chunking and not self.CHUNKING_WITH_GRADIENTS:
+            import sys
+            print("=" * 80, file=sys.stderr)
+            print("CRITICAL CONFIGURATION ERROR: CHUNKING WITHOUT GRADIENT ANALYSIS!", file=sys.stderr)
+            print("When chunking=True, chunking_with_gradients MUST be True.", file=sys.stderr)
+            print("Otherwise, chunk selection will be random instead of importance-based!", file=sys.stderr)
+            print("Solution: Set 'chunking_with_gradients: true' in your configuration.", file=sys.stderr)
+            print("=" * 80, file=sys.stderr)
+            warnings.warn("CHUNKING ENABLED WITHOUT GRADIENT ANALYSIS - THIS WILL USE RANDOM CHUNK SELECTION!")
+            
+        return chunking
+
+    def _is_multi_gpu(self, gpu_index):
+        """Check if multi-GPU is requested based on gpu_index format"""
+        if gpu_index is None:
+            return False
+        
+        if isinstance(gpu_index, str) and ":" in gpu_index:
+            return True
+        
+        return False
+    
+    def _parse_gpu_indices(self, gpu_index):
+        """Parse GPU indices from gpu_index parameter"""
+        if gpu_index is None:
+            return []
+        
+        available_gpus = list_available_gpus()
+        available_indices = [index for index, _ in available_gpus]
+        
+        if isinstance(gpu_index, str) and ":" in gpu_index:
+            try:
+                start, end = map(int, gpu_index.split(":"))
+                requested_indices = list(range(start, end))
+                valid_indices = [idx for idx in requested_indices if idx in available_indices]
+                return valid_indices
+            except ValueError:
+                raise ValueError(f"Invalid GPU range format: {gpu_index}. Expected format: 'start:end'")
+        
+        elif isinstance(gpu_index, (int, str)):
+            try:
+                single_index = int(gpu_index)
+                if single_index in available_indices:
+                    return [single_index]
+                else:
+                    raise ValueError(f"GPU index {single_index} not available. Available indices: {available_indices}")
+            except ValueError:
+                raise ValueError(f"Invalid GPU index: {gpu_index}")
+        
+        return []

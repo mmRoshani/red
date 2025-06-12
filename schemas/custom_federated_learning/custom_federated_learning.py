@@ -1,29 +1,27 @@
-from src.constants.framework import MODEL_UPDATE, SERVER_ID, MESSAGE_BODY_STATES, SIMILARITY_REQUEST, SIMILARITY_REQUEST_APROVE
-from src.core.communication.message import Message
-from src.core.federated import FederatedNode
-from src.decorators.remote import remote
-from src.nets.network_factory import network_factory
+from constants.framework import MODEL_UPDATE, SERVER_ID, MESSAGE_BODY_STATES, SIMILARITY_REQUEST, SIMILARITY_REQUEST_APROVE
+from core.communication.message import Message
+from core.federated import FederatedNode
+from decorators.remote import remote
+from nets.network_factory import network_factory
 import copy
 from typing import Dict, List
 import torch
 from torch.nn import Module as NN
+from utils.checker import device_checker
+from utils.get_last_char_as_int import get_last_char_as_int
+from validators.config_validator import ConfigValidator
+from utils.log import Log
 
-from src.nets.network_factory import network_factory
-from src.utils.checker import device_checker
-from src.utils.get_last_char_as_int import get_last_char_as_int
-from src.validators.config_validator import ConfigValidator
-from src.utils.log import Log
-
-from src.core.aggregator.fed_avg_aggregator_base import FedAvgAggregator
-from src.utils.client_ids_list import client_ids_list_generator
+from core.aggregator.fed_avg_aggregator_base import FedAvgAggregator
+from utils.client_ids_list import client_ids_list_generator
 from typing import List
 import random
 import time
-from src.utils.similarities.distributed_cosine_similarities import DistributedCosineSimilarities
+from .neighbors_cosine_similarities import NeighborsCosineSimilarities
 
 
 @remote(num_gpus=1, num_cpus=1)
-class KConnectFederatedLearning(FederatedNode):
+class CustomFederatedLearning(FederatedNode):
     def __init__(self, node_id: str, role: str, config: 'ConfigValidator', log: Log) -> None:
         super().__init__(node_id=node_id, role=role, config=config, log=log)
         self.model = None
@@ -63,9 +61,6 @@ class KConnectFederatedLearning(FederatedNode):
         
         # Calculate local data size (d_i in the algorithm)
         self.local_data_size = len(self.train_loader.dataset)
-        
-        # Step 2: Each client i selects its own neighbors as a list of N
-        # (This will be populated by the topology manager through self.neighbors)
         
         self.log.info(f'Client {self.id} initialized with local data size: {self.local_data_size}')
 
@@ -165,6 +160,23 @@ class KConnectFederatedLearning(FederatedNode):
                 self.log.warn(f'Client {self.id} timed out waiting for neighbor models')
                 continue
 
+            if message.header == SIMILARITY_REQUEST:
+                sender_id = message.body.get('sender_id')
+                sender_model_vector = message.body.get('model_vector')
+                if 1 == 1 : # for future attack detect!
+                    similarity = NeighborsCosineSimilarities.request_aprove(self,sender_model_vector,sender_id).item()
+                    similarity_with_sender = {f"{sender_id}, local round {message.body.get('round')}" : f"round:{self.local_round_counter} similarity:{similarity}"}
+                    self.similarity_dict.update(similarity_with_sender)
+
+            elif message.header == SIMILARITY_REQUEST_APROVE:
+                sender_id = message.body.get('sender_id')
+                sender_model_vector = message.body.get('model_vector')
+                similarity = (message.body.get("cosine_similarity")).item()
+                if 1 == 1 : # for future attack detect!
+                    similarity_with_sender = {f"{sender_id}, local round {message.body.get('round')}" : f"round:{self.local_round_counter} similarity:{similarity}"}
+                    self.similarity_dict.update(similarity_with_sender)
+                print(self.similarity_dict)
+
             if message.header == MODEL_UPDATE:
                 sender_id = message.body.get('sender_id')
                 received_state = message.body[MESSAGE_BODY_STATES]
@@ -223,49 +235,23 @@ class KConnectFederatedLearning(FederatedNode):
             
             train_accuracy, train_loss = self.calculate_train_accuracy()
             test_accuracy, test_loss = self.calculate_test_accuracy()
-
-            for neighbor_id in self.neighbors:
-                DistributedCosineSimilarities.request(self, neighbor_id)
-
-            DistributedCosineSimilarities.receive_request(self)
     
             self.send_model_to_neighbors()
-
+            
             self.receive_models_from_neighbors()
 
-            self.aggregate_models()
-            
-            post_agg_train_acc, post_agg_train_loss = self.calculate_train_accuracy()
-            post_agg_test_acc, post_agg_test_loss = self.calculate_test_accuracy()
-            
-            self.log.info(f"Client {self.id} Round {round_num + 1} Summary:")
-            self.log.info(f"  After Local Training  - Train Acc: {train_accuracy:.2f}%, Train Loss: {train_loss:.6f}, Test Acc: {test_accuracy:.2f}%, Test Loss: {test_loss:.6f}")
-            self.log.info(f"  After Aggregation     - Train Acc: {post_agg_train_acc:.2f}%, Train Loss: {post_agg_train_loss:.6f}, Test Acc: {post_agg_test_acc:.2f}%, Test Loss: {post_agg_test_loss:.6f}")
-            
-            self.log.info(f"Client {self.id} completed DFL round {round_num + 1}")
+            #Khamideh updates : send model norm to neighbour for similarity
+            NeighborsCosineSimilarities.request(self)
 
     def run(self):
         """Main execution method"""
-        self.log.info(f"Client {self.id} starting DFL with {len(self.neighbors)} neighbors: {self.neighbors}")
         self.run_dfl_rounds()
-        self.log.info(f"Client {self.id} completed all DFL rounds")
 
     def test(self, phase: str = "test"):
-        if phase == "test":
-            test_accuracy, test_loss = self.calculate_test_accuracy()
-            return test_accuracy, len(self.test_loader.dataset)
-        elif phase == "train":
-            train_accuracy, train_loss = self.calculate_train_accuracy()
-            return train_accuracy, len(self.train_loader.dataset)
-        else:
-            raise ValueError(f"Unknown phase: {phase}")
+        """Test the model"""
+        return self.evaluate_model(self.test_loader)
 
     def train(self, optimizer_fn, loss_fn):
-
-        self.build()
-
-        self.optimizer = optimizer_fn(self.model.parameters(), lr=self.config.LEARNING_RATE)
-        self.criterion = loss_fn()
-        
-        self.log.info(f"Client {self.id} has {len(self.neighbors)} neighbors: {self.neighbors}")
-        self.run()
+        """Initialize training components"""
+        self.optimizer = optimizer_fn(self.model.parameters())
+        self.criterion = loss_fn 

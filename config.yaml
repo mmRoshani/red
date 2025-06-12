@@ -1,6 +1,8 @@
 device: 'cuda'
 gpu_index: "0"
 
+random_seed: 42
+
 federation_id: '1.x.y'
 # RvQ: What is the meaning of CLusteredFederatedLearning?
 # TraditionalFederatedLearning | DecentralizedFederatedLearning | ClusterFederatedLearningSchema
@@ -16,8 +18,11 @@ adjacency_matrix: ./adjacency_matrix.csv
 
 learning_rate: 0.001
 model_type: "cnn"
+transformer_model_size: "base"
 pretrained_models: false
 dataset_type: "fmnist"
+loss_function: "CrossEntropy"
+optimizer: "adam"
 
 data_distribution_kind: "30"
 desired_distribution: null
@@ -29,6 +34,11 @@ sensitivity_percentage: 100
 remove_common_ids: false
 # RvQ:
 fed_avg: false
+
+chunking: false                    # Enable chunking
+chunking_with_gradients: false     # CRITICAL: MUST be true when chunking=true for importance analysis
+chunking_parts: 100               # Divide model into 50 equal chunks
+chunking_random_section: false    # Use importance-based selection (not random)
 
 # FedAvg | FedProx
 aggregation_strategy: "FedAvg"
@@ -51,3 +61,5 @@ stop_avg_accuracy: 1.0
 save_before_aggregation_models: false
 save_global_models: false
 
+mean_accuracy_to_csv: true
+use_global_accuracy_for_noniid: true  # Use global accuracy for non-IID evaluation (recommended) 
