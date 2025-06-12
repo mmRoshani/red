@@ -7,6 +7,8 @@ from sklearn.model_selection import train_test_split
 from src.utils.log import Log
 from src.validators.config_validator import ConfigValidator
 
+
+# Dummy placeholder for robust_read and TextDataset
 def robust_read(path):
     with open(path, 'r', encoding='utf-8', errors='ignore') as f:
         return f.read()
@@ -24,6 +26,7 @@ class TextDataset(Dataset):
     def __len__(self):
         return len(self.labels)
 
+ # TODO: I think max_lenght is defined in the config
 def load_and_tokenize(
         data_dir: str,
         config: 'ConfigValidator',
@@ -37,8 +40,10 @@ def load_and_tokenize(
     train_loaders = []
     test_loaders = []
 
+
     tokenizer = BertTokenizer.from_pretrained(pretrained_model)
 
+    # Normalize paths
     data_dir = os.path.abspath(os.path.expanduser(data_dir))
     test_dir = os.path.abspath(os.path.expanduser(data_dir.replace("bbc_train", "bbc_test")))
 
@@ -47,37 +52,14 @@ def load_and_tokenize(
     if not test_dir.rstrip('/').endswith('bbc_test'):
         test_dir += "/bbc_test"
 
-    for client_name in sorted(os.listdir(data_dir)):
-        client_path = os.path.join(data_dir, client_name)
-        if not os.path.isdir(client_path):
+    for client_id in sorted(os.listdir(data_dir)):
+        train_client_path = os.path.join(data_dir, client_id)
+        test_client_path = os.path.join(test_dir, client_id)
+
+        if not os.path.isdir(train_client_path) or not os.path.isdir(test_client_path):
             continue
 
-        print(f"Processing {client_name}...")
-
-        texts = []
-        labels = []
-        label2id = {}
-
-        for label_id, label_name in enumerate(sorted(os.listdir(client_path))):
-            label_path = os.path.join(client_path, label_name)
-            
-            if not os.path.isdir(client_path) or not os.path.isdir(client_path):
-                continue
-
-            log.info(f'Preprocessing client no #: {client_name}')
-
-
-            label2id[label_name] = label_id
-
-            for fn in os.listdir(label_path):
-                if fn.lower().endswith('.txt'):
-                    path = os.path.join(label_path, fn)
-                    raw = robust_read(path)
-                    texts.append(raw.strip())
-                    labels.append(label_id)
-
-        if not texts:
-            continue
+        log.info(f'Preprocessing client no #: {client_id}')
 
         # -------- TRAIN DATA --------
         train_texts, train_labels = [], []
@@ -142,4 +124,6 @@ def load_and_tokenize(
         test_loaders.append(test_loader)
 
     return train_loaders, test_loaders
+
+
 

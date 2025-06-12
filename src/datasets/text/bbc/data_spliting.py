@@ -13,10 +13,12 @@ def parse_args():
     parser.add_argument('--max', type=int, default=10, help='Maximum samples per class')
     return parser.parse_args()
 
+
 def balanced_split_all_classes(input_dir2, output_dir2, labels, num_clients):
-    print(f"\nPerforming balanced split of second dataset into {num_clients} clients...")
+    print(f"\n🔄 Performing balanced split of second dataset into {num_clients} clients...")
     os.makedirs(output_dir2, exist_ok=True)
 
+    # Pre-create client subdirectories
     for i in range(1, num_clients + 1):
         for label in labels:
             os.makedirs(os.path.join(output_dir2, f'client_{i}', label), exist_ok=True)
@@ -26,7 +28,7 @@ def balanced_split_all_classes(input_dir2, output_dir2, labels, num_clients):
         txt_files = [f for f in os.listdir(class_dir) if os.path.isfile(os.path.join(class_dir, f)) and f.lower().endswith('.txt')]
 
         if not txt_files:
-            print(f"No .txt files found in class '{label}', skipping.")
+            print(f"⚠️ No .txt files found in class '{label}', skipping.")
             continue
 
         random.shuffle(txt_files)
@@ -41,10 +43,13 @@ def balanced_split_all_classes(input_dir2, output_dir2, labels, num_clients):
             selected = txt_files[start:start+count]
             for fname in selected:
                 shutil.copy2(os.path.join(class_dir, fname), os.path.join(client_dir, fname))
-            print(f"Copied {len(selected)} '{label}' files to client_{i+1}/{label}")
+            print(f"📦 Copied {len(selected)} '{label}' files to client_{i+1}/{label}")
             start += count
 
-    print("Second balanced splitting complete.")
+    print("✅ Second balanced splitting complete.")
+
+
+
 
 def main():
     seed = 42
@@ -84,11 +89,13 @@ def main():
     for i, (a, b) in enumerate(assignments, 1):
         print(f" Client #{i}: {idx_to_label[a]} & {idx_to_label[b]}")
 
+    # Build class -> client index list
     class_map = {idx: [] for idx in range(num_labels)}
     for client_idx, (a, b) in enumerate(assignments, 1):
         class_map[a].append(client_idx)
         class_map[b].append(client_idx)
 
+    # 🔧 PRE-CREATE all client subdirectories with all labels
     print("\nCreating client directories and label subfolders...")
     for client_idx in range(1, len(assignments)+1):
         client_dir = os.path.join(output_base, f"client_{client_idx}")
@@ -146,8 +153,7 @@ def main():
 
         balanced_split_all_classes(input2_dir, output2_dir, labels, num_clients)
 
-
-    print("\nData splitting complete.")
+    print("\n✅ Data splitting complete.")
 
 if __name__ == "__main__":
     main()

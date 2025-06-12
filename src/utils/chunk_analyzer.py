@@ -8,7 +8,7 @@ and aggregation statistics in federated learning scenarios.
 import torch
 import numpy as np
 from typing import List, Dict, Tuple, Any
-from utils.log import Log
+from src.utils.log import Log
 
 
 class ChunkAnalyzer:
@@ -39,6 +39,7 @@ class ChunkAnalyzer:
             "aggregation_coverage": {},
         }
 
+        # Analyze each client's chunk selection
         chunk_selections = {}
         for client in clients:
             if hasattr(client, 'gradients') and client.gradients:
@@ -51,6 +52,7 @@ class ChunkAnalyzer:
                     "selection_percentage": len(important_indices) / config.CHUNKING_PARTS * 100
                 }
 
+        # Analyze chunk popularity (how many clients selected each chunk)
         chunk_counts = {}
         for chunk_idx in range(config.CHUNKING_PARTS):
             count = sum(1 for indices in chunk_selections.values() if chunk_idx in indices)
@@ -58,6 +60,7 @@ class ChunkAnalyzer:
 
         analysis["chunk_popularity"] = chunk_counts
         
+        # Calculate aggregation coverage
         total_possible_selections = len(clients) * len(chunk_selections.get(list(chunk_selections.keys())[0], []))
         actual_selections = sum(chunk_counts.values())
         
@@ -149,7 +152,7 @@ class ChunkAnalyzer:
         chunk_importance = []
         for i in range(config.CHUNKING_PARTS):
             start_idx = i * chunk_size
-            if i == config.CHUNKING_PARTS - 1:
+            if i == config.CHUNKING_PARTS - 1:  # Last chunk
                 end_idx = total_params
             else:
                 end_idx = start_idx + chunk_size
@@ -163,7 +166,6 @@ class ChunkAnalyzer:
             
             chunk_importance.append(importance)
 
-        # Calculate statistics
         importance_array = np.array(chunk_importance)
         
         return {

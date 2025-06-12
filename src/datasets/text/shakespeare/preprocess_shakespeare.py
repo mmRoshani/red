@@ -13,7 +13,7 @@ limitations under the License.
 
 To run:
   python preprocess_shakespeare.py path/to/raw/shakespeare.txt output_directory/
-The raw datasets can be downloaded from:
+The raw data can be downloaded from:
   http://www.gutenberg.org/cache/epub/100/pg100.txt
 (The Plain Text UTF-8 file format, md5sum: 036d0f9cf7296f41165c2e6da1e52a0e)
 Note that The Comedy of Errors has a incorrect indentation compared to all the
@@ -50,7 +50,7 @@ def _match_continuation_regex(line, comedy_of_errors=False):
 
 
 def _split_into_plays(shakespeare_full):
-    """Splits the full datasets by play."""
+    """Splits the full data by play."""
     # List of tuples (play_name, dict from character to list of lines)
     plays = []
     discarded_lines = []  # Track discarded lines.
@@ -142,7 +142,7 @@ def play_and_character(play, character):
 
 def _get_train_test_by_character(plays, test_fraction=0.2):
     """
-      Splits character datasets into train and test sets.
+      Splits character data into train and test sets.
       if test_fraction <= 0, returns {} for all_test_examples
       plays := list of (play, dict) tuples where play is a string and dict
       is a dictionary with character names as keys
@@ -182,7 +182,7 @@ def _get_train_test_by_character(plays, test_fraction=0.2):
 
 
 def _write_data_by_character(examples, output_directory):
-    """Writes a collection of datasets files by play & character."""
+    """Writes a collection of data files by play & character."""
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
     for character_name, sound_bites in examples.items():
@@ -193,7 +193,7 @@ def _write_data_by_character(examples, output_directory):
 
 
 def main(argv):
-    print('Splitting .txt datasets between users')
+    print('Splitting .txt data between users')
     input_filename = argv[0]
     with open(input_filename, 'r') as input_file:
         shakespeare_full = input_file.read()
@@ -203,9 +203,7 @@ def main(argv):
     output_directory = argv[1]
     with open(os.path.join(output_directory, 'users_and_plays.json'), 'w') as ouf:
         json.dump(users_and_plays, ouf)
-    _write_data_by_character(all_examples,
-                             os.path.join(output_directory,
-                                          'by_play_and_character/'))
+    _write_data_by_character(all_examples, os.path.join(output_directory, 'by_play_and_character/'))
 
 
 if __name__ == '__main__':
