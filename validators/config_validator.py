@@ -576,7 +576,7 @@ class ConfigValidator:
     
     def _validate_client_k_neighbors(self, number_of_clients: int, federated_learning_topology: str, client_k_neighbors: int):
         if federated_learning_topology == 'k_connect' and client_k_neighbors is not None:
-            if number_of_clients > client_k_neighbors >= 1: 
+            if number_of_clients > client_k_neighbors > 1: 
                 return client_k_neighbors
             else: 
                 raise TypeError(f"number_of_clients must be greater than client_k_neighbors and client_k_neighbors must be greater than 1"

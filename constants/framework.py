@@ -15,8 +15,5 @@ SERVER_ID: str = "server"
 
 # Communication
 MODEL_UPDATE: str = "model_update"
-SIMILARITY_REQUEST: str = "similarity_request"
-SIMILARITY_REQUEST_APROVE: str= "similarity_request_aprove"
-
 
 MESSAGE_BODY_STATES = "state"
