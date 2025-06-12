@@ -1,6 +1,6 @@
 from src.constants.datasets_constants import DATA_SET_BBC, DATA_SET_SHAKESPEARE
 from .image.load_and_prepare_data import load_and_prepare_data
-from datasets.text.bbc.preprocess import load_and_tokenize
+from .text.bbc.preprocess import load_and_tokenize
 from src.constants import framework
 from .text.shakespeare.shakespear_factory import dl_generator_shakespeare
 
