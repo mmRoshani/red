@@ -21,9 +21,7 @@ import torch
 def ring_federated_learning_executor(config: ConfigValidator, log: Log):
 
     # TODO: read from .env files
-    runtime_env = {
-        "working_dir": "/home/amir/red"
-    }
+    runtime_env = {}
     ray.init(runtime_env=runtime_env)
 
     federation = RingFederatedLearningSchema(
