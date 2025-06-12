@@ -4,6 +4,7 @@ from src.constants.topology_constants import *
 from src.schemas import star_federated_learning_executor
 from src.schemas.ring_federated_learning.ring_federated_learning_executor import ring_federated_learning_executor
 from src.schemas.k_connect_federated_learning.k_connect_federated_learning_executor import k_connect_federated_learning_executor
+from src.schemas.custom_federated_learning.custom_federated_learning_executor import custom_federated_learning_executor
 from src.utils.log import Log
 
 
@@ -23,7 +24,9 @@ def schema_factory(schema: str, topology: str, log: 'Log'):
             log.info(f"returning {function.__name__}")
             return function
         elif topology == TOPOLOGY_CUSTOM:
-            return NotImplementedError
+            function = custom_federated_learning_executor
+            log.info(f"returning {function.__name__}")
+            return function
         return None
     elif schema == CLUSTER_FEDERATED_LEARNING:
         raise NotImplementedError()

@@ -1,4 +1,4 @@
-from src.constants.framework import MODEL_UPDATE, SERVER_ID, MESSAGE_BODY_STATES, SIMILARITY_REQUEST, SIMILARITY_REQUEST_APROVE
+from src.constants.framework import MODEL_UPDATE, SERVER_ID, MESSAGE_BODY_STATES
 from src.core.communication.message import Message
 from src.core.federated import FederatedNode
 from src.decorators.remote import remote

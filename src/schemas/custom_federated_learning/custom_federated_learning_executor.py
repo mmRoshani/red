@@ -1,17 +1,17 @@
- from typing import Dict, List
+from typing import Union, List
 import ray
 from ray.util.placement_group import PlacementGroup
 
-from core.federated.federated_base import FederatedBase
-from core.federated.federated_node import FederatedNode
-from core.federated.virtual_node import VirtualNode
-from utils.client_ids_list import client_ids_list_generator
-from validators.config_validator import ConfigValidator
-from utils.log import Log
+from src.core.federated.federated_base import FederatedBase
+from src.core.federated.federated_node import FederatedNode
+from src.core.federated.virtual_node import VirtualNode
+from src.utils.client_ids_list import client_ids_list_generator
+from src.validators.config_validator import ConfigValidator
+from src.utils.log import Log
 from .custom_federated_learning_schema import CustomFederatedLearningSchema
 from .custom_federated_learning import CustomFederatedLearning
 
-def create_custom_federated_learning(
+def custom_federated_learning_executor(
     config: ConfigValidator,
     log: Log,
     resources: Union[str, PlacementGroup] = "uniform",
