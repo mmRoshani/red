@@ -17,7 +17,7 @@ from utils.client_ids_list import client_ids_list_generator
 from typing import List
 import random
 import time
-from ..distributed_cosine_similarities import DistributedCosineSimilarities
+from ...utils.similarities.distributed_cosine_similarities import DistributedCosineSimilarities
 
 
 @remote(num_gpus=1, num_cpus=1)
