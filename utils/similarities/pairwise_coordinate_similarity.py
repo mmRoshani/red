@@ -3,9 +3,27 @@ from heapq import nlargest
 from utils.log import Log
 from collections import Counter
 from itertools import combinations
+import torch
 
-def pairwise_coordinate_similarity(clients, remove_common_ids: bool, log: 'Log'):
-    sensitivity_percentage: float = clients[0].sensitivity_percentage
+from validators.config_validator import ConfigValidator
+
+
+def cosine_similarity(base_weights, model_weights):
+    return torch.nan_to_num(
+        torch.clip(
+            torch.dot(base_weights, model_weights)
+            / (torch.linalg.norm(base_weights) * torch.linalg.norm(model_weights)),
+            -1,
+            1,
+        ),
+        0,
+    )
+
+
+def pairwise_coordinate_similarity(clients, remove_common_ids: bool, config: ConfigValidator, log: 'Log'):
+    log.info("USE CLIPPED COSINE SIMILARITY TOO PLEASE")
+
+    sensitivity_percentage: float = config.SENSITIVITY_PERCENTAGE
 
     _top_gradients_count = int(
         np.ceil(

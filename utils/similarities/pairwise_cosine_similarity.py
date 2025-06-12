@@ -35,7 +35,6 @@ def pairwise_cosine_similarity(clients, consider_parameters: bool, log):
                 similarities[i][j] = 0.0
             else:
                 similarities[i][j] = np.dot(vi, vj) / (norm_i * norm_j)
-    print(similarities)
-    np.fill_diagonal(similarities, 1)
 
+    np.fill_diagonal(similarities, 1)
     return similarities

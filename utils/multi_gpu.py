@@ -18,9 +18,11 @@ def setup_model_for_gpu(model, config, log: Log):
     if config.MULTI_GPU and len(config.GPU_DEVICE_IDS) > 1:
         log.info(f"Setting up model for multi-GPU training on devices: {config.GPU_DEVICE_IDS}")
         
+        # Move model to primary device first
         primary_device = f"cuda:{config.GPU_DEVICE_IDS[0]}"
         model = model.to(primary_device)
         
+        # Wrap model with DataParallel for multi-GPU training
         model = nn.DataParallel(model, device_ids=config.GPU_DEVICE_IDS)
         
         log.info(f"Model wrapped with DataParallel across GPUs: {config.GPU_DEVICE_IDS}")
