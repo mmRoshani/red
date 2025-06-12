@@ -1,5 +1,5 @@
-from constants.models_constants import *
-from constants.optimizer_constants import *
+from src.constants.models_constants import *
+from src.constants.optimizer_constants import *
 from typing import List
 def model_constans_exporter() -> List[str]:
     return [

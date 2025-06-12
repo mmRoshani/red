@@ -4,8 +4,8 @@ from torch.utils.data import Dataset, DataLoader, random_split
 from transformers import BertTokenizer
 from sklearn.model_selection import train_test_split
 
-from utils.log import Log
-from validators.config_validator import ConfigValidator
+from src.utils.log import Log
+from src.validators.config_validator import ConfigValidator
 
 def robust_read(path):
     with open(path, 'r', encoding='utf-8', errors='ignore') as f:

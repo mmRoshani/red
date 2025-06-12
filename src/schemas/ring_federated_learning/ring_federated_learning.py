@@ -1,21 +1,21 @@
-from constants.framework import MODEL_UPDATE, SERVER_ID, MESSAGE_BODY_STATES
-from core.communication.message import Message
-from core.federated import FederatedNode
-from decorators.remote import remote
-from nets.network_factory import network_factory
+from src.constants.framework import MODEL_UPDATE, SERVER_ID, MESSAGE_BODY_STATES
+from src.core.communication.message import Message
+from src.core.federated import FederatedNode
+from src.decorators.remote import remote
+from src.nets.network_factory import network_factory
 import copy
 from typing import Dict
 import torch
 from torch.nn import Module as NN
-from utils.checker import device_checker
-from utils.get_last_char_as_int import get_last_char_as_int
-import utils.similarities.pairwise_cosine_similarity
-from validators.config_validator import ConfigValidator
-from utils.log import Log
+from src.utils.checker import device_checker
+from src.utils.get_last_char_as_int import get_last_char_as_int
+import src.utils.similarities.pairwise_cosine_similarity
+from src.validators.config_validator import ConfigValidator
+from src.utils.log import Log
 
-from core.aggregator.fed_avg_aggregator_base import FedAvgAggregator
-from utils.client_ids_list import client_ids_list_generator
-from utils.similarities.pairwise_cosine_similarity import pairwise_cosine_similarity
+from src.core.aggregator.fed_avg_aggregator_base import FedAvgAggregator
+from src.utils.client_ids_list import client_ids_list_generator
+from src.utils.similarities.pairwise_cosine_similarity import pairwise_cosine_similarity
 from typing import List
 import random
 import time

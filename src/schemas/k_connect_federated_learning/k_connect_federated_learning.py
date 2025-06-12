@@ -1,23 +1,23 @@
-from constants.framework import MODEL_UPDATE, SERVER_ID, MESSAGE_BODY_STATES, SIMILARITY_REQUEST, SIMILARITY_REQUEST_APROVE
-from core.communication.message import Message
-from core.federated import FederatedNode
-from decorators.remote import remote
-from nets.network_factory import network_factory
+from src.constants.framework import MODEL_UPDATE, SERVER_ID, MESSAGE_BODY_STATES, SIMILARITY_REQUEST, SIMILARITY_REQUEST_APROVE
+from src.core.communication.message import Message
+from src.core.federated import FederatedNode
+from src.decorators.remote import remote
+from src.nets.network_factory import network_factory
 import copy
 from typing import Dict, List
 import torch
 from torch.nn import Module as NN
-from utils.checker import device_checker
-from utils.get_last_char_as_int import get_last_char_as_int
-from validators.config_validator import ConfigValidator
-from utils.log import Log
+from src.utils.checker import device_checker
+from src.utils.get_last_char_as_int import get_last_char_as_int
+from src.validators.config_validator import ConfigValidator
+from src.utils.log import Log
 
-from core.aggregator.fed_avg_aggregator_base import FedAvgAggregator
-from utils.client_ids_list import client_ids_list_generator
+from src.core.aggregator.fed_avg_aggregator_base import FedAvgAggregator
+from src.utils.client_ids_list import client_ids_list_generator
 from typing import List
 import random
 import time
-from utils.similarities.distributed_cosine_similarities import DistributedCosineSimilarities
+from src.utils.similarities.distributed_cosine_similarities import DistributedCosineSimilarities
 
 
 @remote(num_gpus=1, num_cpus=1)

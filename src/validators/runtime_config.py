@@ -1,7 +1,6 @@
-<<<<<<< HEAD:src/validators/runtime_config.py
 from dataclasses import dataclass
 from typing import List
-from utils.log import Log
+from src.utils.log import Log
 from torch.utils.data import DataLoader
 
 
@@ -16,11 +15,6 @@ class RuntimeConfig:
     # TODO: HE related runtime configurations
     
     log: Log
-=======
-from dataclasses import dataclass
-from typing import List
-from utils.log import Log
-from torch.utils.data import DataLoader
 
 
 @dataclass
@@ -34,4 +28,3 @@ class RuntimeConfig:
     # TODO: HE related runtime configurations
     
     log: Log
->>>>>>> dev:validators/runtime_config.py

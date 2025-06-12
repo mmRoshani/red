@@ -1,9 +1,3 @@
-<<<<<<< HEAD:src/constants/data_distribution_constants.py
-DATA_DISTRIBUTION_FIX = "fix"
-DATA_DISTRIBUTION_N_20 = "20"
-DATA_DISTRIBUTION_N_30 = "30"
-DATA_DISTRIBUTION_DIR = "dir"
-=======
 DATA_DISTRIBUTION_FIX = "fix"
 
 DATA_DISTRIBUTION_IID = "iid"
@@ -20,4 +14,3 @@ DATA_DISTRIBUTION_N_80 = "80"
 DATA_DISTRIBUTION_N_90 = "90"
 DATA_DISTRIBUTION_DIR = "dir"
 DATA_DISTRIBUTION_REAL_FEMNIST = "real"
->>>>>>> dev:constants/data_distribution_constants.py

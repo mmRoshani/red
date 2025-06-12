@@ -1,4 +1,4 @@
-from constants.framework import SIMILARITY_REQUEST, SIMILARITY_REQUEST_APROVE
+from src.constants.framework import SIMILARITY_REQUEST, SIMILARITY_REQUEST_APROVE
 import torch
 
 class DistributedCosineSimilarities():

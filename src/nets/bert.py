@@ -1,6 +1,6 @@
 import torch.nn as nn
 from transformers import BertModel, BertConfig
-from constants.models_constants import TRANSFORMER_MODEL_SIZE_BASE, TRANSFORMER_MODEL_SIZE_LARGE
+from src.constants.models_constants import TRANSFORMER_MODEL_SIZE_BASE, TRANSFORMER_MODEL_SIZE_LARGE
 
 class Bert(nn.Module):
     def __init__(self, number_of_classes: int=None, pretrained_model: bool=True, model_size: str =TRANSFORMER_MODEL_SIZE_BASE):

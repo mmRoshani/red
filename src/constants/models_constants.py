@@ -1,13 +1,3 @@
-<<<<<<< HEAD:src/constants/models_constants.py
-MODEL_CNN = "cnn"
-MODEL_LENET = "LENET"
-MODEL_RESNET_18 = "resnet18"
-MODEL_RESNET_50 = "resnet50"
-MODEL_MOBILENET = "mobilenet"
-MODEL_VGG = "vgg16"
-MODEL_VIT = "vit"
-MODEL_SWIN = "swin"
-=======
 MODEL_CNN = "cnn"
 MODEL_LENET = "LENET"
 MODEL_RESNET_18 = "resnet18"
@@ -23,4 +13,3 @@ MODEL_ALBERT = "albert"
 
 TRANSFORMER_MODEL_SIZE_BASE = "base"
 TRANSFORMER_MODEL_SIZE_LARGE= "large"
->>>>>>> dev:constants/models_constants.py
