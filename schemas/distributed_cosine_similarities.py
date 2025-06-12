@@ -1,9 +1,9 @@
 from constants.framework import SIMILARITY_REQUEST, SIMILARITY_REQUEST_APROVE
 import torch
 
-class NeighborsCosineSimilarities():
+class DistributedCosineSimilarities():
 
-    def request(sender):
+    def request(sender, receiver_id):
         
         model_vector = torch.nn.utils.parameters_to_vector(sender.model.parameters())
 
@@ -15,8 +15,7 @@ class NeighborsCosineSimilarities():
 
         sender.log.info(f"Client {sender.id} sending model vertor to {len(sender.neighbors)} neighbors: {sender.neighbors}")
         
-        for neighbor_id in sender.neighbors:
-            sender.send(header=SIMILARITY_REQUEST, body=message_body, to=neighbor_id)
+        sender.send(header=SIMILARITY_REQUEST, body=message_body, to=receiver_id)
         return
     
     def request_aprove(receiver, sender_model_vector , sender_id):
@@ -26,6 +25,7 @@ class NeighborsCosineSimilarities():
         receiver_model_norm = torch.norm(receiver_model_vector)
 
         cosine_similarity = torch.dot(receiver_model_vector,sender_model_vector)/(receiver_model_norm*sender_model_norm)
+        cosine_similarity = (cosine_similarity+1)/2
 
         message_body = {
             'sender_id': receiver.id,
@@ -53,13 +53,12 @@ class NeighborsCosineSimilarities():
                 receiver.log.warn(f'Client {receiver.id} timed out waiting for neighbor models')
                 continue
 
-            #Khamideh updates : similarity requests-----------------------
             elif message.header == SIMILARITY_REQUEST:
                 sender_id = message.body.get('sender_id')
                 sender_model_vector = message.body.get('model_vector')
 
                 if 1 == 1 : # for future attack detect!
-                    similarity = NeighborsCosineSimilarities.request_aprove(receiver,sender_model_vector,sender_id).item()
+                    similarity = DistributedCosineSimilarities.request_aprove(receiver,sender_model_vector,sender_id).item()
                     similarity_with_sender = {f"{sender_id}, local round {message.body.get("round")}" : f"round:{receiver.local_round_counter} similarity:{similarity}"}
                     receiver.similarity_dict.update(similarity_with_sender)
 

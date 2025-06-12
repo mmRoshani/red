@@ -17,7 +17,7 @@ from utils.client_ids_list import client_ids_list_generator
 from typing import List
 import random
 import time
-from .neighbors_cosine_similarities import NeighborsCosineSimilarities
+from ..distributed_cosine_similarities import DistributedCosineSimilarities
 
 
 @remote(num_gpus=1, num_cpus=1)
@@ -222,14 +222,13 @@ class KConnectFederatedLearning(FederatedNode):
             train_accuracy, train_loss = self.calculate_train_accuracy()
             test_accuracy, test_loss = self.calculate_test_accuracy()
 
+            for neighbor_id in self.neighbors:
+                DistributedCosineSimilarities.request(self, neighbor_id)
 
-            #Khamideh updates : send model norm to neighbour for similarity
-            NeighborsCosineSimilarities.request(self)
-
-            NeighborsCosineSimilarities.receive_request(self)
+            DistributedCosineSimilarities.receive_request(self)
     
             self.send_model_to_neighbors()
-            
+
             self.receive_models_from_neighbors()
 
             self.aggregate_models()
