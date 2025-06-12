@@ -51,7 +51,7 @@ test_batch_size: 28
 transform_input_size: 28
 weight_decay: null
 
-number_of_clients: 3
+number_of_clients: 4
 client_sampling_rate: 1.0
 pre_computed_data_driven_clustering: false
 do_cluster: true
