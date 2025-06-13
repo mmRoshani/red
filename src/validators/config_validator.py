@@ -39,6 +39,10 @@ from src.constants.topology_constants import  (
     TOPOLOGY_K_CONNECT, 
     TOPOLOGY_CUSTOM
 )
+from src.validators.adjacency_matrix_validator import(
+    AdjacencyMatrixValidator
+)
+
 from src.constants.models_constants import (
     MODEL_CNN,
     MODEL_RESNET_18,
@@ -96,6 +100,7 @@ from src.constants.data_distribution_constants import (
 from src.utils.gpu_index_list import list_available_gpus
 from src.utils.log import Log
 from src.validators.runtime_config import RuntimeConfig
+from src.validators.adjacency_matrix_validator import AdjacencyMatrixValidator
 
 
 class ConfigValidator:
@@ -151,6 +156,7 @@ class ConfigValidator:
             xmkckks_weight_decimals: int = None,
             use_global_accuracy_for_noniid: bool = True,
             draw_topology: bool = False,
+            adjacency_matrix_file_name: str = None,
 
     ):
 
@@ -204,6 +210,8 @@ class ConfigValidator:
         self.PRETRAINED_MODELS = pretrained_models
         self.FEDERATED_LEARNING_SCHEMA = self._federated_learning_schema(federated_learning_schema)
         self.FEDERATED_LEARNING_TOPOLOGY = self._schem_n_toplogy_macher(federated_learning_schema, federated_learning_topology)
+        
+        self.ADJACENCY_MATRIX = AdjacencyMatrixValidator(adjacency_matrix)
         self.CLIENT_K_NEIGHBORS = self._validate_client_k_neighbors(number_of_clients, federated_learning_topology, client_k_neighbors)
         self.CLIENT_ROLE = self._client_role(client_role)
         self.CLIENT_SAMPLING_RATE = client_sampling_rate

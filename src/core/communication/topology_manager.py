@@ -66,27 +66,12 @@ class TopologyManager:
                 if self._config and self._config.DRAW_TOPOLOGY:
                     nx.draw(self._graph, with_labels=True)
                     plt.show()
-            elif self._topology == TOPOLOGY_CUSTOM:
-                #self._graph = nx.from_numpy_array(np.array(self.adjacency_matrix))
-                '''
-                Some tips on how to make this more robust:
-                Check for the attribute of adjacency matrix like this maybe:
-                if hasattr(self, "adjacency_matrix"):
-                    self._graph = nx.from_numpy_array(np.array(self.adjacency_matrix))
-                else:
-                    raise ValueError("Custom topology requires 'adjacency_matrix' attribute.")
-                but here?
-                
-                Make sure adjacency_matrix is square and matches the number of nodes.
-
-                If your nodes have IDs other than 0, 1, ..., n-1, you'll need to relabel the graph after creation
-                
-                       This goes here? |
-                                       V
-                '''
         elif isinstance(self._topology, np.ndarray):
-            raise NotImplementedError
-
+            self._graph = nx.from_numpy_array(self._topology)
+            self._graph = nx.relabel_nodes(self._graph, {i: self._node_ids[i] for i in range(len(self._node_ids))})
+            if self._config and self._config.DRAW_TOPOLOGY:
+                nx.draw(self._graph, with_labels=True)
+                plt.show()
 
 def  _get_or_create_broker(
     placement_group, federation_id: str, bundle_offset: int, config=None

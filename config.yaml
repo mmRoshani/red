@@ -8,14 +8,15 @@ federation_id: '1.x.y'
 # TraditionalFederatedLearning | DecentralizedFederatedLearning | ClusterFederatedLearningSchema
 federated_learning_schema: 'DecentralizedFederatedLearning'
 # The network topology of the federated learning: star, k_connect, ring, custom (given an adjacency matrix)
-draw_topology: false
-federated_learning_topology: 'k_connect'
+draw_topology: true
+federated_learning_topology: 'custom'
+adjacency_matrix_file_name: 'adjacency_matrix_1.csv'
+
 # For k_connect topology 
 client_k_neighbors: 2
 
 # train | test | eval | train-test-eval | train-eval | etc.
 client_role: 'train' # RvQ: We got clients that only train or only evaluate?
-adjacency_matrix: ./adjacency_matrix.csv 
 
 learning_rate: 0.001
 model_type: "cnn"

@@ -30,6 +30,7 @@ def load_objectified_yaml(yaml_path: str):
         'federated_learning_schema': None,
         'federated_learning_topology': None,
         'draw_topology': False,
+        'adjacency_matrix_file_name': None,
         'client_k_neighbors': None,
         'client_role': None,
         'federation_id': "",

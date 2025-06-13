@@ -58,7 +58,7 @@ class CustomFederatedLearningSchema(FederatedBase):
                 train_nodes.append(node)
                
         ray.get(
-            self._tp_manager.link_nodes_with_adjacency_matrix.remote(
+            self._tp_manager.link_nodes.remote(
                 [node.id for node in train_nodes], 
                 self.config.ADJACENCY_MATRIX
             )
