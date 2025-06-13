@@ -3,7 +3,7 @@ gpu_index: "0"
 
 random_seed: 42
 
-federation_id: '1.x.y'
+federation_id: '1.x.1'
 # RvQ: What is the meaning of CLusteredFederatedLearning?
 # TraditionalFederatedLearning | DecentralizedFederatedLearning | ClusterFederatedLearningSchema
 federated_learning_schema: 'DecentralizedFederatedLearning'
@@ -53,7 +53,7 @@ test_batch_size: 28
 transform_input_size: 28
 weight_decay: null
 
-number_of_clients: 3
+number_of_clients: 4
 client_sampling_rate: 1.0
 pre_computed_data_driven_clustering: false
 do_cluster: true

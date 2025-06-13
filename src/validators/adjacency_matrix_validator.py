@@ -4,6 +4,25 @@ import os
 import warnings
 #from src.utils.yaml_loader import config
 
+class AdjacencyMatrixValidator:
+    def __init__(self, adjacency_matrix=None):
+        self.adjacency_matrix = adjacency_matrix
+        if adjacency_matrix is not None:
+            self.validate_matrix(adjacency_matrix)
+
+    def validate_matrix(self, matrix):
+        if not isinstance(matrix, (list, np.ndarray)):
+            raise ValueError("Adjacency matrix must be a list or numpy array")
+        
+        matrix = np.array(matrix)
+        if not validate_matrix_is_square(matrix):
+            raise ValueError("Adjacency matrix is not square")
+        
+        if not validate_matrix_is_symmetric(matrix):
+            raise ValueError("Adjacency matrix is not symmetric")
+        
+        return matrix
+
 def normalize_values(matrix: np.ndarray) -> np.ndarray:
     numeric_matrix = np.nan_to_num(matrix.astype(float), nan=0.0)
     return np.where(numeric_matrix > 0, 1, 0)

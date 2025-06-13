@@ -41,6 +41,7 @@ class CustomFederatedLearning(FederatedNode):
         self.local_round_counter = 0
         self.global_round_counter = 0
         self.local_data_size = 0  # d_i in the algorithm
+        self.build()
 
     def build(self):
         """Initialize peer components"""
@@ -92,7 +93,6 @@ class CustomFederatedLearning(FederatedNode):
         
         accuracy = 100 * correct / total
         avg_loss = total_loss / num_batches
-        
         self.model.train()  # Set back to training mode
         return accuracy, avg_loss
 
