@@ -150,6 +150,7 @@ class ConfigValidator:
             encryption_method: str = None,
             xmkckks_weight_decimals: int = None,
             use_global_accuracy_for_noniid: bool = True,
+            draw_topology: bool = False,
 
     ):
 
@@ -211,6 +212,7 @@ class ConfigValidator:
         self.FEDERATION_ID = federation_id
         self.MEAN_ACCURACY_TO_CSV = mean_accuracy_to_csv
         self.USE_GLOBAL_ACCURACY_FOR_NONIID = use_global_accuracy_for_noniid
+        self.DRAW_TOPOLOGY = draw_topology
 
     @property
     def RUNTIME_COMFIG(self) -> RuntimeConfig:

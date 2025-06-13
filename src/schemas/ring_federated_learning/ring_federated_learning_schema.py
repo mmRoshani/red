@@ -96,7 +96,7 @@ class RingFederatedLearningSchema(FederatedBase):
         """
         if self._tp_manager is None:
             self._tp_manager = _get_or_create_broker(
-                self._pg, self._fed_id, self._bundle_offset
+                self._pg, self._fed_id, self._bundle_offset, self.config
             )
         print(f"================================> Self._tmp_manager is: {self._tp_manager}")
         train_nodes = []

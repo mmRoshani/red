@@ -103,7 +103,7 @@ class StarFederatedLearningSchema(FederatedBase):
         """
         if self._tp_manager is None:
             self._tp_manager = _get_or_create_broker(
-                self._pg, self._fed_id, self._bundle_offset
+                self._pg, self._fed_id, self._bundle_offset, self.config
             )
         train_nodes = []
         for i, node in enumerate(self._nodes, start=1 + self._bundle_offset):

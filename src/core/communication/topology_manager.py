@@ -1,6 +1,7 @@
 import ray
 import networkx as nx
 import numpy as np
+import matplotlib.pyplot as plt
 
 from src.utils.topology_generator import generate_k_connected_graph_from_nodes
 from src.constants import TOPOLOGY_MANAGER_CPU_RESOURCES
@@ -13,8 +14,9 @@ from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
 
 @ray.remote(num_cpus=TOPOLOGY_MANAGER_CPU_RESOURCES, max_concurrency=100)
 class TopologyManager:
-    def __init__(self, federation_id: str) -> None:
+    def __init__(self, federation_id: str, config=None) -> None:
         self._fed_id = federation_id
+        self._config = config
 
         self._node_ids: List[str] = []
         self._nodes: Dict[str] = None
@@ -50,20 +52,20 @@ class TopologyManager:
             if self._topology == TOPOLOGY_STAR:
                 self._graph = nx.star_graph(self._node_ids)
             elif self._topology == TOPOLOGY_K_CONNECT:
-                
                 self._graph = generate_k_connected_graph_from_nodes(self._node_ids, k)
                 # Relabel nodes to use actual node_ids instead of 0,1,2...
                 mapping = {i: self._node_ids[i] for i in range(len(self._node_ids))}
                 self._graph = nx.relabel_nodes(self._graph, mapping)
-                # TODO: make network it configurable
-                # nx.draw(self._graph, with_labels=True)
-                # plt.show()
+                if self._config and self._config.DRAW_TOPOLOGY:
+                    nx.draw(self._graph, with_labels=True)
+                    plt.show()
             elif self._topology == TOPOLOGY_RING:
                 print(f"the node_ids are {type(self._node_ids)} and the node itself is {type(self._node_ids[0])}")
                 self._topology = nx.cycle_graph(self._node_ids)
                 self._graph = nx.cycle_graph(self._node_ids)
-                # nx.draw(self._graph, with_labels=True)
-                # plt.show()
+                if self._config and self._config.DRAW_TOPOLOGY:
+                    nx.draw(self._graph, with_labels=True)
+                    plt.show()
             elif self._topology == TOPOLOGY_CUSTOM:
                 #self._graph = nx.from_numpy_array(np.array(self.adjacency_matrix))
                 '''
@@ -87,7 +89,7 @@ class TopologyManager:
 
 
 def  _get_or_create_broker(
-    placement_group, federation_id: str, bundle_offset: int
+    placement_group, federation_id: str, bundle_offset: int, config=None
 ) -> TopologyManager:
     return TopologyManager.options(
         name=federation_id + "/broker",
@@ -95,4 +97,4 @@ def  _get_or_create_broker(
         scheduling_strategy=PlacementGroupSchedulingStrategy(
             placement_group, placement_group_bundle_index=0 + bundle_offset
         ),
-    ).remote(federation_id=federation_id)
+    ).remote(federation_id=federation_id, config=config)

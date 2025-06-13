@@ -8,6 +8,7 @@ federation_id: '1.x.y'
 # TraditionalFederatedLearning | DecentralizedFederatedLearning | ClusterFederatedLearningSchema
 federated_learning_schema: 'DecentralizedFederatedLearning'
 # The network topology of the federated learning: star, k_connect, ring, custom (given an adjacency matrix)
+draw_topology: false
 federated_learning_topology: 'k_connect'
 # For k_connect topology 
 client_k_neighbors: 2
