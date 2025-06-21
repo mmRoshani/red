@@ -13,7 +13,7 @@ federated_learning_topology: 'custom'
 adjacency_matrix_file_name: 'adjacency_matrix_1.csv'
 
 # For k_connect topology 
-client_k_neighbors: 2
+client_k_neighbors: 3
 
 # train | test | eval | train-test-eval | train-eval | etc.
 client_role: 'train' # RvQ: We got clients that only train or only evaluate?
@@ -53,7 +53,7 @@ test_batch_size: 28
 transform_input_size: 28
 weight_decay: null
 
-number_of_clients: 4
+number_of_clients: 6
 client_sampling_rate: 1.0
 pre_computed_data_driven_clustering: false
 do_cluster: true

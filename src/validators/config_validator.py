@@ -210,8 +210,7 @@ class ConfigValidator:
         self.PRETRAINED_MODELS = pretrained_models
         self.FEDERATED_LEARNING_SCHEMA = self._federated_learning_schema(federated_learning_schema)
         self.FEDERATED_LEARNING_TOPOLOGY = self._schem_n_toplogy_macher(federated_learning_schema, federated_learning_topology)
-        
-        self.ADJACENCY_MATRIX = AdjacencyMatrixValidator(adjacency_matrix)
+        self.ADJACENCY_MATRIX = self._validate_adjacency_matrix(adjacency_matrix_file_name)
         self.CLIENT_K_NEIGHBORS = self._validate_client_k_neighbors(number_of_clients, federated_learning_topology, client_k_neighbors)
         self.CLIENT_ROLE = self._client_role(client_role)
         self.CLIENT_SAMPLING_RATE = client_sampling_rate
@@ -652,3 +651,6 @@ class ConfigValidator:
                 raise ValueError(f"Invalid GPU index: {gpu_index}")
         
         return []
+    
+    def _validate_adjacency_matrix(self, adjacency_matrix_file_name: str) -> List:
+        return AdjacencyMatrixValidator.validate_matrix(adjacency_matrix_file_name)

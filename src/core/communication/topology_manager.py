@@ -48,6 +48,7 @@ class TopologyManager:
         }
 
         self._topology = topology
+        print(f"------------------------------------{type(self._topology)}")
         if isinstance(self._topology, str):
             if self._topology == TOPOLOGY_STAR:
                 self._graph = nx.star_graph(self._node_ids)
